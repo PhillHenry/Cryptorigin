@@ -1,11 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>uk.co.odinconsultants/</groupId>
+  <groupId>uk.co.odinconsultants</groupId>
   <artifactId>cryptorigin</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <description>Examine block chains of any size</description>
   <inceptionYear>2017</inceptionYear>
+  <packaging>pom</packaging>
   <licenses>
     <license>
       <name>GNU GPL 2</name>
@@ -21,6 +22,10 @@
     <scala.version>2.11.5</scala.version>
     <scala.compat.version>2.11</scala.compat.version>
   </properties>
+
+  <modules>
+    <module>bitcoin</module>
+  </modules>
 
   <dependencies>
     <dependency>
