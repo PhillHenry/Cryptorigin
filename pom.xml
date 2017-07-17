@@ -21,10 +21,13 @@
     <encoding>UTF-8</encoding>
     <scala.version>2.11.5</scala.version>
     <scala.compat.version>2.11</scala.compat.version>
+    <hadoop.version>2.7.3</hadoop.version>
+    <spark.version>2.1.1</spark.version>
   </properties>
 
   <modules>
     <module>bitcoin</module>
+    <module>bitcoin-integration</module>
   </modules>
 
   <dependencies>
