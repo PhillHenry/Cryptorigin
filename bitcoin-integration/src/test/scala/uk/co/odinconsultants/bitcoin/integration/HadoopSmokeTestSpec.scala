@@ -5,8 +5,11 @@ import java.nio.file.Files.createTempDirectory
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hdfs.MiniDFSCluster
 import org.apache.hadoop.hdfs.MiniDFSCluster.HDFS_MINIDFS_BASEDIR
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
 
+@RunWith(classOf[JUnitRunner])
 class HadoopSmokeTestSpec extends WordSpec with Matchers {
 
   "Hadoop mini cluster" should {
