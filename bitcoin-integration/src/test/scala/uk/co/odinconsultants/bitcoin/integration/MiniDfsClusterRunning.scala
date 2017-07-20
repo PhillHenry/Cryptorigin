@@ -36,14 +36,13 @@ trait MiniDfsClusterRunning extends Logging {
     allPaths.toList
   }
 
-  def copy(inputFile: Path, hdfs: Path): Unit = {
-    val toFile = new Path("/" + inputFile.getName)
-    distributedFS.copyFromLocalFile(false, false, inputFile, toFile)
+  def copyToHdfs(inputFile: Path): Path = {
+    val fromFile  = inputFile.getName
+    val toFile    = new Path("/" + fromFile)
+    info(s"Copying '$fromFile' to '$toFile' (${toFile.getName})")
+    distributedFS.copyFromLocalFile(false, true, inputFile, toFile)
+    toFile
   }
-
-  def toHdfs(x: String): Path = new Path(x)
-
-  def toDirectory: Path = new Path("/")
 
   def localFile(local: String): Path = {
     val classLoader = getClass.getClassLoader

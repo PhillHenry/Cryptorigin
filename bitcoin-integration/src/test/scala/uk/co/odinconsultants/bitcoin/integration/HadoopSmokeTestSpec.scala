@@ -16,11 +16,12 @@ class HadoopSmokeTestSpec extends WordSpec with Matchers with MiniDfsClusterRunn
 
   "Hadoop mini cluster" should {
     "hold Hadoop files" in {
-      copy(localFile("multiblock.blk"), toDirectory)
+      val hdfsFile = copyToHdfs(localFile("multiblock.blk"))
+
       val files = list("/")
       files should have size 1
 
-      val rdd = sc.newAPIHadoopFile("/" + files.head.getName, classOf[BitcoinBlockFileInputFormat], classOf[BytesWritable], classOf[BitcoinBlock], conf)
+      val rdd = sc.newAPIHadoopFile(hdfsFile.toString, classOf[BitcoinBlockFileInputFormat], classOf[BytesWritable], classOf[BitcoinBlock], conf)
       rdd.count() should be > 0L
     }
   }
