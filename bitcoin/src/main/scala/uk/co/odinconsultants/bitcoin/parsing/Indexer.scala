@@ -19,7 +19,10 @@ object Indexer {
 
   val toOutputAddress: (BitcoinTransactionOutput) => TraversableOnce[PubKey] = { case (txOutput) =>
     val script = new Script(txOutput.getTxOutScript)
-    if (script.isSentToAddress) Some(script.getToAddress(networkParams)) else None
+
+    if (script.isSentToAddress) Some(script.getToAddress(networkParams))
+    else if (script.isPayToScriptHash) Some(script.getToAddress(networkParams))
+    else None
   }
 
   def index(rdd: RDD[(BytesWritable, BitcoinBlock)]): RDD[PubKey] = {
