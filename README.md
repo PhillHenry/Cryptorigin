@@ -8,3 +8,4 @@ The aim of this project is to allow researchers to explore blockchains with the 
 ### Technologies
 * Spark 2.0+
 * Hadoop 2.7
+* HBase as a key/value store. Since it is Hadoop based, this seems an appropriate choice of store.

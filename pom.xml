@@ -29,6 +29,7 @@
   <modules>
     <module>bitcoin</module>
     <module>bitcoin-integration</module>
+    <module>core</module>
   </modules>
 
   <dependencies>
