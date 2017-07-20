@@ -7,6 +7,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock
 import org.zuinnote.hadoop.bitcoin.format.mapreduce.BitcoinBlockFileInputFormat
+import uk.co.odinconsultants.bitcoin.parsing.Indexer
 
 @RunWith(classOf[JUnitRunner])
 class HadoopSmokeTestSpec extends WordSpec with Matchers with MiniDfsClusterRunning {
@@ -23,6 +24,10 @@ class HadoopSmokeTestSpec extends WordSpec with Matchers with MiniDfsClusterRunn
 
       val rdd = sc.newAPIHadoopFile(hdfsFile.toString, classOf[BitcoinBlockFileInputFormat], classOf[BytesWritable], classOf[BitcoinBlock], conf)
       rdd.count() should be > 0L
+
+      val outputs = Indexer.index(rdd)
+      outputs.count() should be > 0L
+      println("Outputs = " + outputs.collect().mkString("\n"))
     }
   }
 
