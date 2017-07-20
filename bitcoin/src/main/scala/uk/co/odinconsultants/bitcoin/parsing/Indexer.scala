@@ -11,20 +11,19 @@ import scala.collection.JavaConversions._
 
 object Indexer {
 
-  type PubKey = Option[Address]
+  type PubKey = Address
 
   val networkParams = new MainNetParams
 
   val toTransaction: ((BytesWritable, BitcoinBlock)) => Seq[BitcoinTransaction] = { case (_, block) => block.getTransactions }
 
-  val toOutputAddress: (BitcoinTransactionOutput) => Seq[PubKey] = { case (txOutput) =>
+  val toOutputAddress: (BitcoinTransactionOutput) => TraversableOnce[PubKey] = { case (txOutput) =>
     val script = new Script(txOutput.getTxOutScript)
-    val address = if (script.isSentToAddress) Some(script.getToAddress(networkParams)) else None
-    Seq(address)
+    if (script.isSentToAddress) Some(script.getToAddress(networkParams)) else None
   }
 
   def index(rdd: RDD[(BytesWritable, BitcoinBlock)]): RDD[PubKey] = {
-    rdd.flatMap(toTransaction).flatMap(_.getListOfOutputs.flatMap(toOutputAddress))
+    rdd.flatMap(toTransaction).flatMap(_.getListOfOutputs).flatMap(toOutputAddress)
   }
 
 }

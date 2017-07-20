@@ -27,7 +27,7 @@ class HadoopSmokeTestSpec extends WordSpec with Matchers with MiniDfsClusterRunn
 
       val outputs = Indexer.index(rdd)
       outputs.count() should be > 0L
-      println("Outputs = " + outputs.collect().mkString("\n"))
+//      println("Outputs = " + outputs.collect().mkString("\n"))
     }
   }
 
