@@ -1,14 +1,13 @@
 package uk.co.odinconsultants.bitcoin.integration
 
 import org.apache.hadoop.fs.LocalFileSystem
+import org.apache.hadoop.hbase._
+import org.apache.hadoop.hbase.client._
+import org.apache.hadoop.hbase.util.Bytes.toBytes
+import org.apache.hadoop.hdfs.DistributedFileSystem
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
-import org.apache.hadoop.hbase._
-import org.apache.hadoop.hbase.client._
-import org.apache.hadoop.hbase.util.Bytes
-import org.apache.hadoop.hbase.util.Bytes.toBytes
-import org.apache.hadoop.hdfs.DistributedFileSystem
 
 @RunWith(classOf[JUnitRunner])
 class HBaseSmokeTestSpec extends WordSpec with Matchers {

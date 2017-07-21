@@ -15,7 +15,7 @@ object Indexer {
 
   val networkParams: MainNetParams = MainNetParams.get()
 
-  val toTransaction: ((BytesWritable, BitcoinBlock)) => Seq[BitcoinTransaction] = { case (_, block) => block.getTransactions }
+  val toTransactions: ((BytesWritable, BitcoinBlock)) => Seq[BitcoinTransaction] = { case (_, block) => block.getTransactions }
 
   val toOutputAddress: (BitcoinTransactionOutput) => TraversableOnce[PubKey] = { case (txOutput) =>
     val script = new Script(txOutput.getTxOutScript)
@@ -25,8 +25,7 @@ object Indexer {
     else None
   }
 
-  def index(rdd: RDD[(BytesWritable, BitcoinBlock)]): RDD[PubKey] = {
-    rdd.flatMap(toTransaction).flatMap(_.getListOfOutputs).flatMap(toOutputAddress)
-  }
+  def index(rdd: RDD[(BytesWritable, BitcoinBlock)]): RDD[PubKey] =
+    rdd.flatMap(toTransactions).flatMap(_.getListOfOutputs).flatMap(toOutputAddress)
 
 }
