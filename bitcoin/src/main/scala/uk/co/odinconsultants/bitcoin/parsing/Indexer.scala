@@ -13,7 +13,7 @@ object Indexer {
 
   type PubKey = Address
 
-  val networkParams = new MainNetParams
+  val networkParams: MainNetParams = MainNetParams.get()
 
   val toTransaction: ((BytesWritable, BitcoinBlock)) => Seq[BitcoinTransaction] = { case (_, block) => block.getTransactions }
 
