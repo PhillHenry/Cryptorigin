@@ -1,4 +1,4 @@
-package uk.co.odinconsultants.bitcoin.integration
+package uk.co.odinconsultants.bitcoin.integration.hadoop
 
 import java.io.File
 
@@ -6,7 +6,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.hdfs.{DistributedFileSystem, MiniDFSCluster}
 import uk.co.odinconsultants.bitcoin.core.Logging
-import uk.co.odinconsultants.bitcoin.integration.FsUtils.tmpDirectory
+import uk.co.odinconsultants.bitcoin.integration.utils.FsUtils.tmpDirectory
 
 import scala.collection.mutable.ArrayBuffer
 

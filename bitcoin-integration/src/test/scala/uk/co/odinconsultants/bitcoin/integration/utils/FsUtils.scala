@@ -1,4 +1,4 @@
-package uk.co.odinconsultants.bitcoin.integration
+package uk.co.odinconsultants.bitcoin.integration.utils
 
 import java.io.File
 import java.nio.file.Files

@@ -7,6 +7,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock
 import org.zuinnote.hadoop.bitcoin.format.mapreduce.BitcoinBlockFileInputFormat
+import uk.co.odinconsultants.bitcoin.integration.hadoop.MiniDfsClusterRunning
 import uk.co.odinconsultants.bitcoin.parsing.Indexer
 
 @RunWith(classOf[JUnitRunner])

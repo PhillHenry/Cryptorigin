@@ -1,4 +1,4 @@
-package uk.co.odinconsultants.bitcoin.integration
+package uk.co.odinconsultants.bitcoin.integration.utils
 
 import org.apache.hadoop.hbase.util.Bytes.toBytes
 import org.bitcoinj.core.Address
