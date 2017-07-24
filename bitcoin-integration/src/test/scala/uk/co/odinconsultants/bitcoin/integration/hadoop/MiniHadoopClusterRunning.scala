@@ -1,26 +1,17 @@
 package uk.co.odinconsultants.bitcoin.integration.hadoop
 
-import java.io.File
-
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
-import org.apache.hadoop.hdfs.{DistributedFileSystem, MiniDFSCluster}
+import org.apache.hadoop.hdfs.DistributedFileSystem
 import uk.co.odinconsultants.bitcoin.core.Logging
-import uk.co.odinconsultants.bitcoin.integration.utils.FsUtils.tmpDirectory
+import uk.co.odinconsultants.bitcoin.integration.hadoop.HadoopForTesting.hdfsCluster
 
 import scala.collection.mutable.ArrayBuffer
 
-trait MiniDfsClusterRunning extends Logging {
+trait MiniHadoopClusterRunning extends Logging {
 
-  val baseDir: File                         = tmpDirectory("tests").getAbsoluteFile
-  val conf                                  = new Configuration()
-  conf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, baseDir.getAbsolutePath)
-  val builder                               = new MiniDFSCluster.Builder(conf)
-
-  info("Attempting to start HDFS")
-  val hdfsCluster: MiniDFSCluster           = builder.build()
   val distributedFS: DistributedFileSystem  = hdfsCluster.getFileSystem
-  val hdfsUri: String                       = "hdfs://127.0.0.1:" + hdfsCluster.getNameNodePort + "/"
+  val conf: Configuration                   = HadoopForTesting.conf
 
   def list(path: String): List[Path] = {
     info(s"Looking in $path")

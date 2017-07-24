@@ -1,20 +1,17 @@
 package uk.co.odinconsultants.bitcoin.integration
 
 import org.apache.hadoop.io.BytesWritable
-import org.apache.spark.{SparkConf, SparkContext}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock
 import org.zuinnote.hadoop.bitcoin.format.mapreduce.BitcoinBlockFileInputFormat
-import uk.co.odinconsultants.bitcoin.integration.hadoop.MiniDfsClusterRunning
+import uk.co.odinconsultants.bitcoin.integration.hadoop.MiniHadoopClusterRunning
+import uk.co.odinconsultants.bitcoin.integration.spark.SparkForTesting.sc
 import uk.co.odinconsultants.bitcoin.parsing.Indexer
 
 @RunWith(classOf[JUnitRunner])
-class HadoopSparkIntegrationTestSpec extends WordSpec with Matchers with MiniDfsClusterRunning {
-
-  val sparkConf: SparkConf    = new SparkConf().setMaster("local[*]").setAppName("Tests")
-  val sc: SparkContext        = SparkContext.getOrCreate(sparkConf)
+class HadoopSparkIntegrationTestSpec extends WordSpec with Matchers with MiniHadoopClusterRunning {
 
   "Hadoop mini cluster" should {
     "hold Hadoop files" in {
