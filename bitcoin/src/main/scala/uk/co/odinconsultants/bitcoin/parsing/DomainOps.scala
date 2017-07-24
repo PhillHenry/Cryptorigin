@@ -14,11 +14,6 @@ object DomainOps {
 
   val toBackReference: (BitcoinTransactionInput) => BackReference = { in => (in.getPrevTransactionHash, in.getPreviousTxOutIndex) }
 
-  val backReferenceToAddress: (BitcoinTransaction) => Seq[(BackReference, PubKey)] = { tx =>
-    val txHash = hashOf(tx)
-    tx.getListOfOutputs.zipWithIndex.flatMap { case (out, i) => toOutputAddress(out).map(addr => (txHash, i.toLong) -> addr) }
-  }
-
   def hashOf(tx: BitcoinTransaction): Array[Byte] = getTransactionHash(tx)
 
   val toOutputAddress: (BitcoinTransactionOutput) => TraversableOnce[PubKey] = { case (txOutput) =>
@@ -27,6 +22,11 @@ object DomainOps {
     if (script.isSentToAddress) Some(script.getToAddress(networkParams))
     else if (script.isPayToScriptHash) Some(script.getToAddress(networkParams))
     else None
+  }
+
+  val toBackReferenceAddressTuples: (BitcoinTransaction) => Seq[(BackReference, PubKey)] = { tx =>
+    val txHash = hashOf(tx)
+    tx.getListOfOutputs.zipWithIndex.flatMap { case (out, i) => toOutputAddress(out).map(addr => (txHash, i.toLong) -> addr) }
   }
 
 }

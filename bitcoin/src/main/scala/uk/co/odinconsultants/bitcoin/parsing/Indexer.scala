@@ -16,7 +16,7 @@ object Indexer {
 
   val networkParams: MainNetParams = MainNetParams.get()
 
-  def index(rdd: RDD[(BytesWritable, BitcoinBlock)]): RDD[PubKey] = // TODO these mappings must be persisted
-    rdd.flatMap(toTransactions).flatMap(_.getListOfOutputs).flatMap(toOutputAddress)
+  def index(rdd: RDD[(BytesWritable, BitcoinBlock)]): RDD[(BackReference, PubKey)] =
+    rdd.flatMap(toTransactions).flatMap(toBackReferenceAddressTuples)
 
 }
