@@ -11,7 +11,7 @@ import uk.co.odinconsultants.bitcoin.integration.hadoop.MiniDfsClusterRunning
 import uk.co.odinconsultants.bitcoin.parsing.Indexer
 
 @RunWith(classOf[JUnitRunner])
-class HadoopSparkIntegraionTestSpec extends WordSpec with Matchers with MiniDfsClusterRunning {
+class HadoopSparkIntegrationTestSpec extends WordSpec with Matchers with MiniDfsClusterRunning {
 
   val sparkConf: SparkConf    = new SparkConf().setMaster("local[*]").setAppName("Tests")
   val sc: SparkContext        = SparkContext.getOrCreate(sparkConf)

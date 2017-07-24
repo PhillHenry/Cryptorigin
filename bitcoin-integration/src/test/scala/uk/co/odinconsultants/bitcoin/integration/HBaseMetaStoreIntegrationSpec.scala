@@ -22,8 +22,6 @@ class HBaseMetaStoreIntegrationSpec extends WordSpec with Matchers with HBaseTes
       val selector        = new HBaseMetaRetrieval(table, familyName)
       val actualAddress   = selector(hash, index)
       actualAddress shouldEqual expectedAddress
-
-      utility.shutdownMiniCluster()
     }
   }
 

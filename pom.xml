@@ -43,7 +43,6 @@
       <groupId>org.scalautils</groupId>
       <artifactId>scalautils_2.11</artifactId>
       <version>2.1.7</version>
-      <!--<scope>test</scope>-->
     </dependency>
     <!-- Test -->
     <dependency>
@@ -96,7 +95,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.18.1</version>
         <configuration>
-          <useFile>false</useFile>
+          <useFile>true</useFile>
           <disableXmlReport>true</disableXmlReport>
           <!-- If you have classpath issue like NoDefClassError,... -->
           <!-- useManifestOnlyJar>false</useManifestOnlyJar -->
