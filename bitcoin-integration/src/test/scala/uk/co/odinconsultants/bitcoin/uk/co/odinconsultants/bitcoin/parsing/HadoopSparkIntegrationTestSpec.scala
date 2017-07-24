@@ -1,4 +1,4 @@
-package uk.co.odinconsultants.bitcoin.integration
+package uk.co.odinconsultants.bitcoin.uk.co.odinconsultants.bitcoin.parsing
 
 import org.apache.hadoop.io.BytesWritable
 import org.junit.runner.RunWith

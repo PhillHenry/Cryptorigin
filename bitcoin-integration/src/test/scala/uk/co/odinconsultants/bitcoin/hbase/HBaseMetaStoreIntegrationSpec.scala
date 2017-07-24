@@ -1,12 +1,11 @@
-package uk.co.odinconsultants.bitcoin.integration
+package uk.co.odinconsultants.bitcoin.hbase
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
 import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup._
-import uk.co.odinconsultants.bitcoin.hbase.{HBaseMetaRetrieval, HBaseMetaStore}
-import uk.co.odinconsultants.bitcoin.integration.utils.DomainTestObjects._
 import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseRunning
+import uk.co.odinconsultants.bitcoin.integration.utils.DomainTestObjects._
 
 @RunWith(classOf[JUnitRunner])
 class HBaseMetaStoreIntegrationSpec extends WordSpec with Matchers with HBaseRunning {
