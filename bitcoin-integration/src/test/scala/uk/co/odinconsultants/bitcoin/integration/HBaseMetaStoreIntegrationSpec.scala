@@ -7,13 +7,12 @@ import org.apache.hadoop.hbase._
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes.toBytes
 import org.apache.hadoop.hdfs.DistributedFileSystem
-import org.bitcoinj.core.Address
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
-import uk.co.odinconsultants.bitcoin.hbase.HBaseMetaStore
-import uk.co.odinconsultants.bitcoin.parsing.Indexer
-import uk.co.odinconsultants.bitcoin.parsing.Indexer.networkParams
+import uk.co.odinconsultants.bitcoin.hbase.HBaseMetaRetrieval.toAddress
+import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup._
+import uk.co.odinconsultants.bitcoin.hbase.{HBaseMetaRetrieval, HBaseMetaStore}
 
 @RunWith(classOf[JUnitRunner])
 class HBaseMetaStoreIntegrationSpec extends WordSpec with Matchers {
@@ -26,25 +25,26 @@ class HBaseMetaStoreIntegrationSpec extends WordSpec with Matchers {
       val utility = new org.apache.hadoop.hbase.HBaseTestingUtility(configuration)
       utility.startMiniCluster()
 
-      val admin       = utility.getHBaseAdmin
+      val admin           = utility.getHBaseAdmin
 
-      val tableName   = "mytable"
-      val familyName  = "familyName"
-      createTable(admin, tableName, familyName)
+      createAddressesTable(admin)
 
-      val table       = admin.getConnection.getTable(tableName)
+      val table           = admin.getConnection.getTable(tableName)
 
-      val inserter    = new HBaseMetaStore(table, familyName)
+      val inserter        = new HBaseMetaStore(table, familyName)
 
-      val hash        = toBytes("rowkey1")
-      val index       = 42
-      val actual      = Array.fill(20)(0.toByte)
-      val address     = Address.fromP2SHHash(networkParams, actual)
+      val hash            = toBytes("rowkey1")
+      val index           = 42
+      val rawAddress      = Array.fill(20)(0.toByte)
+      val expectedAddress = toAddress(rawAddress)
 
-      inserter((hash, index), address)
 
-      val value       = select(table, HBaseMetaStore.append(hash, index))
-      value shouldEqual actual
+      inserter((hash, index), expectedAddress)
+
+      val selector        = new HBaseMetaRetrieval(table, familyName)
+      val actualAddress   = selector(hash, index)
+
+      actualAddress shouldEqual expectedAddress
 
       utility.shutdownMiniCluster()
     }
@@ -56,10 +56,4 @@ class HBaseMetaStoreIntegrationSpec extends WordSpec with Matchers {
     result.value()
   }
 
-  private def createTable(admin: HBaseAdmin, tableName: String, familyName: String) = {
-    val tableDescriptor = new HTableDescriptor(TableName.valueOf(tableName))
-    val colDescriptor   = new HColumnDescriptor(familyName)
-    tableDescriptor.addFamily(colDescriptor)
-    admin.createTable(tableDescriptor)
-  }
 }
