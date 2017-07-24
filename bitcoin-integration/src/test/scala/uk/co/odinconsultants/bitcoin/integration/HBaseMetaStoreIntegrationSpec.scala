@@ -1,16 +1,22 @@
 package uk.co.odinconsultants.bitcoin.integration
 
+import java.nio.ByteBuffer
+
 import org.apache.hadoop.fs.LocalFileSystem
 import org.apache.hadoop.hbase._
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes.toBytes
 import org.apache.hadoop.hdfs.DistributedFileSystem
+import org.bitcoinj.core.Address
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
+import uk.co.odinconsultants.bitcoin.hbase.HBaseMetaStore
+import uk.co.odinconsultants.bitcoin.parsing.Indexer
+import uk.co.odinconsultants.bitcoin.parsing.Indexer.networkParams
 
 @RunWith(classOf[JUnitRunner])
-class HBaseSmokeTestSpec extends WordSpec with Matchers {
+class HBaseMetaStoreIntegrationSpec extends WordSpec with Matchers {
 
   "HBase" should {
     "be there for integration tests" in {
@@ -27,28 +33,27 @@ class HBaseSmokeTestSpec extends WordSpec with Matchers {
       createTable(admin, tableName, familyName)
 
       val table       = admin.getConnection.getTable(tableName)
-      val key         = "rowkey1"
-      val actual      = "value"
 
-      insert(table, familyName, key, actual)
+      val inserter    = new HBaseMetaStore(table, familyName)
 
-      val value       = select(table, key)
-      value shouldEqual toBytes(actual)
+      val hash        = toBytes("rowkey1")
+      val index       = 42
+      val actual      = Array.fill(20)(0.toByte)
+      val address     = Address.fromP2SHHash(networkParams, actual)
+
+      inserter((hash, index), address)
+
+      val value       = select(table, HBaseMetaStore.append(hash, index))
+      value shouldEqual actual
 
       utility.shutdownMiniCluster()
     }
   }
 
-  private def select(table: HTableInterface, key: String) = {
-    val aGet    = new Get(toBytes(key))
+  private def select(table: HTableInterface, key: ByteBuffer) = {
+    val aGet    = new Get(key.array())
     val result  = table.get(aGet)
     result.value()
-  }
-
-  private def insert(table: HTableInterface, familyName: String, key: String, actual: String) = {
-    val aPut = new Put(toBytes(key))
-    aPut.addColumn(toBytes(familyName), Array(), toBytes(actual))
-    table.put(aPut)
   }
 
   private def createTable(admin: HBaseAdmin, tableName: String, familyName: String) = {

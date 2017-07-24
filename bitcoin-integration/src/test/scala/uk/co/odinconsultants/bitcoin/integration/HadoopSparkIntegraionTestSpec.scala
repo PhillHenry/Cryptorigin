@@ -10,7 +10,7 @@ import org.zuinnote.hadoop.bitcoin.format.mapreduce.BitcoinBlockFileInputFormat
 import uk.co.odinconsultants.bitcoin.parsing.Indexer
 
 @RunWith(classOf[JUnitRunner])
-class HadoopSmokeTestSpec extends WordSpec with Matchers with MiniDfsClusterRunning {
+class HadoopSparkIntegraionTestSpec extends WordSpec with Matchers with MiniDfsClusterRunning {
 
   val sparkConf: SparkConf    = new SparkConf().setMaster("local[*]").setAppName("Tests")
   val sc: SparkContext        = SparkContext.getOrCreate(sparkConf)
@@ -27,7 +27,6 @@ class HadoopSmokeTestSpec extends WordSpec with Matchers with MiniDfsClusterRunn
 
       val outputs = Indexer.index(rdd)
       outputs.count() should be > 0L
-//      println("Outputs = " + outputs.collect().mkString("\n"))
     }
   }
 
