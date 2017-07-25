@@ -2,22 +2,21 @@ package uk.co.odinconsultants.bitcoin.hbase
 
 import java.nio.ByteBuffer
 
-import org.apache.hadoop.hbase.client.{HTableInterface, Put}
+import org.apache.hadoop.hbase.client.{Put, Table}
 import org.apache.hadoop.hbase.util.Bytes.toBytes
 import uk.co.odinconsultants.bitcoin.parsing.MetaStore
-import uk.co.odinconsultants.bitcoin.parsing.MetaStore.Payload
+import uk.co.odinconsultants.bitcoin.parsing.MetaStore.Batch
 
 import scala.Array.emptyByteArray
-
 import scala.collection.JavaConversions._
 
-class HBaseMetaStore(table: HTableInterface, familyName: String) extends MetaStore {
+class HBaseMetaStore(table: Table, familyName: String) extends MetaStore {
 
   import HBaseMetaStore._
 
   val familyNameAsBytes: Array[Byte] = toBytes(familyName)
 
-  def apply(payload: Payload): Unit = {
+  def apply(payload: Batch): Unit = {
     val puts = payload.map { case (backReference, publicKey) =>
       val (hash, index)               = backReference
       val key                         = append(hash, index)

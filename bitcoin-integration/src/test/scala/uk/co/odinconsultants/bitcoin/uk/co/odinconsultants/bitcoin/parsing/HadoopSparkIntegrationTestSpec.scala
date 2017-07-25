@@ -7,8 +7,9 @@ import org.scalatest.{Matchers, WordSpec}
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock
 import org.zuinnote.hadoop.bitcoin.format.mapreduce.BitcoinBlockFileInputFormat
 import uk.co.odinconsultants.bitcoin.integration.hadoop.MiniHadoopClusterRunning
+import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseForTesting
 import uk.co.odinconsultants.bitcoin.integration.spark.SparkForTesting.sc
-import uk.co.odinconsultants.bitcoin.parsing.Indexer
+import uk.co.odinconsultants.bitcoin.parsing.Indexer._
 
 @RunWith(classOf[JUnitRunner])
 class HadoopSparkIntegrationTestSpec extends WordSpec with Matchers with MiniHadoopClusterRunning {
@@ -23,8 +24,10 @@ class HadoopSparkIntegrationTestSpec extends WordSpec with Matchers with MiniHad
       val rdd = sc.newAPIHadoopFile(hdfsFile.toString, classOf[BitcoinBlockFileInputFormat], classOf[BytesWritable], classOf[BitcoinBlock], conf)
       rdd.count() should be > 0L
 
-      val outputs = Indexer.index(rdd)
+      val outputs = index(rdd)
       outputs.count() should be > 0L
+
+//      write(outputs, HBaseForTesting.admin.getConnection)
     }
   }
 

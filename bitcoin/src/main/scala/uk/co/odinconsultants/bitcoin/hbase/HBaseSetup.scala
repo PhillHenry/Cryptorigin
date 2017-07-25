@@ -5,15 +5,16 @@ import org.apache.hadoop.hbase.client.HBaseAdmin
 
 object HBaseSetup {
 
-  val tableName: String   = "Addresses"
+  val metaTable: String   = "Addresses"
+  val tableName: TableName = TableName.valueOf(metaTable)
   val familyName: String  = "familyName"
 
   def createAddressesTable(admin: HBaseAdmin): Unit = {
-    createTable(admin, tableName, familyName)
+    createTable(admin, metaTable, familyName)
   }
 
   private def createTable(admin: HBaseAdmin, tableName: String, familyName: String): Unit = {
-    val tableDescriptor = new HTableDescriptor(TableName.valueOf(tableName))
+    val tableDescriptor = new HTableDescriptor(tableName)
     val colDescriptor   = new HColumnDescriptor(familyName)
     tableDescriptor.addFamily(colDescriptor)
     admin.createTable(tableDescriptor)

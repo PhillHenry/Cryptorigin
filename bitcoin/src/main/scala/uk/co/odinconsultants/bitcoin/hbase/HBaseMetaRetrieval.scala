@@ -1,11 +1,11 @@
 package uk.co.odinconsultants.bitcoin.hbase
 
-import org.apache.hadoop.hbase.client.{Get, HTableInterface}
+import org.apache.hadoop.hbase.client.{Get, Table}
 import org.bitcoinj.core.Address
 import uk.co.odinconsultants.bitcoin.parsing.Indexer._
 import uk.co.odinconsultants.bitcoin.parsing.MetaRetrieval
 
-class HBaseMetaRetrieval(table: HTableInterface, familyName: String) extends MetaRetrieval {
+class HBaseMetaRetrieval(table: Table, familyName: String) extends MetaRetrieval {
 
   import HBaseMetaRetrieval._
 

@@ -13,10 +13,13 @@ class HBaseMetaStoreIntegrationSpec extends WordSpec with Matchers with HBaseRun
   "HBase" should {
     "be there for integration tests" in {
       createAddressesTable(admin)
-      val table           = admin.getConnection.getTable(tableName)
+      val connection      = admin.getConnection
+      val table           = connection.getTable(metaTable)
 
-      val inserter        = new HBaseMetaStore(table, familyName)
-      inserter(List(((hash, index), expectedAddress)))
+      val inserter        = new HBaseMetaStore(connection.getTable(metaTable), familyName)
+      val metadatum       = ((hash, index), expectedAddress)
+      val metadata        = List(metadatum)
+      inserter(metadata)
 
       val selector        = new HBaseMetaRetrieval(table, familyName)
       val actualAddress   = selector(hash, index)

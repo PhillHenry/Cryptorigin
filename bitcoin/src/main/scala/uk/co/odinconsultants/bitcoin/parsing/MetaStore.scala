@@ -1,10 +1,11 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
 import uk.co.odinconsultants.bitcoin.parsing.Indexer._
-import uk.co.odinconsultants.bitcoin.parsing.MetaStore.Payload
+import uk.co.odinconsultants.bitcoin.parsing.MetaStore.Batch
 
-trait MetaStore extends (Payload => Unit)
+trait MetaStore extends (Batch => Unit)
 
 object MetaStore {
-  type Payload = List[(BackReference, PubKey)]
+  type Payload  = (BackReference, PubKey)
+  type Batch    = List[Payload]
 }
