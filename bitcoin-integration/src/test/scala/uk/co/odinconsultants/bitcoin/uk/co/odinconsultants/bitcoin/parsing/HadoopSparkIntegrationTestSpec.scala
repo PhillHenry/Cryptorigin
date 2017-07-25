@@ -6,8 +6,11 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock
 import org.zuinnote.hadoop.bitcoin.format.mapreduce.BitcoinBlockFileInputFormat
+import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup.createAddressesTable
 import uk.co.odinconsultants.bitcoin.integration.hadoop.MiniHadoopClusterRunning
 import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseForTesting
+import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseForTesting.utility
+import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseTestConfig.getConnection
 import uk.co.odinconsultants.bitcoin.integration.spark.SparkForTesting.sc
 import uk.co.odinconsultants.bitcoin.parsing.Indexer._
 
@@ -27,7 +30,8 @@ class HadoopSparkIntegrationTestSpec extends WordSpec with Matchers with MiniHad
       val outputs = index(rdd)
       outputs.count() should be > 0L
 
-//      write(outputs, HBaseForTesting.admin.getConnection)
+      createAddressesTable(HBaseForTesting.admin)
+      write(outputs, () => getConnection(utility.getConfiguration))
     }
   }
 

@@ -21,10 +21,10 @@ object Indexer {
   def index(rdd: RDD[(BytesWritable, BitcoinBlock)]): RDD[Payload] =
     rdd.flatMap(toTransactions).flatMap(toBackReferenceAddressTuples)
 
-  def write(rdd: RDD[Payload], connection: Connection): Unit = {
+  def write(rdd: RDD[Payload], connectionFactory: () => Connection): Unit = {
     val batchSize = 100
     rdd.foreachPartition { iter =>
-      val table     = connection.getTable(tableName)
+      val table     = connectionFactory().getTable(tableName)
       val metaStore = new HBaseMetaStore(table, familyName)
 
       iter.grouped(batchSize).foreach { metaIter =>
