@@ -4,10 +4,12 @@ import java.nio.ByteBuffer
 
 import org.apache.hadoop.hbase.client.{HTableInterface, Put}
 import org.apache.hadoop.hbase.util.Bytes.toBytes
-import uk.co.odinconsultants.bitcoin.parsing.Indexer._
 import uk.co.odinconsultants.bitcoin.parsing.MetaStore
+import uk.co.odinconsultants.bitcoin.parsing.MetaStore.Payload
 
 import scala.Array.emptyByteArray
+
+import scala.collection.JavaConversions._
 
 class HBaseMetaStore(table: HTableInterface, familyName: String) extends MetaStore {
 
@@ -15,13 +17,14 @@ class HBaseMetaStore(table: HTableInterface, familyName: String) extends MetaSto
 
   val familyNameAsBytes: Array[Byte] = toBytes(familyName)
 
-  def apply(backReference: BackReference, publicKey: PubKey): Unit = {
-
-    val (hash, index) = backReference
-    val key           = append(hash, index)
-    val aPut          = new Put(key)
-    aPut.addColumn(familyNameAsBytes, emptyByteArray, publicKey.getHash160)
-    table.put(aPut)
+  def apply(payload: Payload): Unit = {
+    val puts = payload.map { case (backReference, publicKey) =>
+      val (hash, index)               = backReference
+      val key                         = append(hash, index)
+      val aPut                        = new Put(key)
+      aPut.addColumn(familyNameAsBytes, emptyByteArray, publicKey.getHash160)
+    }
+    table.put(puts)
   }
 
 }

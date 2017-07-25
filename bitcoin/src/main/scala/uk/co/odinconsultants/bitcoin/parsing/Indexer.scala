@@ -7,8 +7,6 @@ import org.bitcoinj.params.MainNetParams
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock
 import uk.co.odinconsultants.bitcoin.parsing.DomainOps._
 
-import scala.collection.JavaConversions._
-
 object Indexer {
 
   type PubKey         = Address

@@ -16,7 +16,7 @@ class HBaseMetaStoreIntegrationSpec extends WordSpec with Matchers with HBaseRun
       val table           = admin.getConnection.getTable(tableName)
 
       val inserter        = new HBaseMetaStore(table, familyName)
-      inserter((hash, index), expectedAddress)
+      inserter(List(((hash, index), expectedAddress)))
 
       val selector        = new HBaseMetaRetrieval(table, familyName)
       val actualAddress   = selector(hash, index)
