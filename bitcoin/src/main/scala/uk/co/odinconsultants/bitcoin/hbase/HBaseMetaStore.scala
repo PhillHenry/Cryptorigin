@@ -1,16 +1,19 @@
 package uk.co.odinconsultants.bitcoin.hbase
 
+import java.io.{ByteArrayOutputStream, ObjectOutputStream}
 import java.nio.ByteBuffer
 
 import org.apache.hadoop.hbase.client.{Put, Table}
 import org.apache.hadoop.hbase.util.Bytes.toBytes
+import uk.co.odinconsultants.bitcoin.parsing.Indexer.PubKey
 import uk.co.odinconsultants.bitcoin.parsing.MetaStore
 import uk.co.odinconsultants.bitcoin.parsing.MetaStore.Batch
+import uk.co.odinconsultants.bitcoin.core.Logging
 
 import scala.Array.emptyByteArray
 import scala.collection.JavaConversions._
 
-class HBaseMetaStore(table: Table, familyName: String) extends MetaStore {
+class HBaseMetaStore(table: Table, familyName: String) extends MetaStore with Logging {
 
   import HBaseMetaStore._
 
@@ -21,7 +24,9 @@ class HBaseMetaStore(table: Table, familyName: String) extends MetaStore {
       val (hash, index)               = backReference
       val key                         = append(hash, index)
       val aPut                        = new Put(key)
-      aPut.addColumn(familyNameAsBytes, emptyByteArray, publicKey.getHash160)
+      println(s"PH: Adding ${key.array.deep} -> ${publicKey.getHash160.mkString(",")} ($publicKey)")
+
+      aPut.addColumn(familyNameAsBytes, emptyByteArray, serialize(publicKey))
     }
     table.put(puts)
   }
@@ -36,6 +41,15 @@ object HBaseMetaStore {
     byteBuffer.putLong(index)
     byteBuffer.flip()
     byteBuffer
+  }
+
+  def serialize(publicKey: PubKey): Array[Byte] = {
+    val aos = new ByteArrayOutputStream()
+    val oos = new ObjectOutputStream(aos)
+    oos.writeObject(publicKey)
+    val bytes = aos.toByteArray
+    oos.close()
+    bytes
   }
 
 }

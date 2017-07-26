@@ -14,6 +14,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>uk.co.odinconsultants</groupId>
+            <artifactId>core</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.zuinnote</groupId>
             <artifactId>hadoopcryptoledger-fileformat</artifactId>
             <version>1.0.4</version>

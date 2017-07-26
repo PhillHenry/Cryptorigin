@@ -1,7 +1,8 @@
 package uk.co.odinconsultants.bitcoin.hbase
 
+import java.io.{ByteArrayInputStream, ObjectInputStream}
+
 import org.apache.hadoop.hbase.client.{Get, Table}
-import org.bitcoinj.core.Address
 import uk.co.odinconsultants.bitcoin.parsing.Indexer._
 import uk.co.odinconsultants.bitcoin.parsing.MetaRetrieval
 
@@ -22,6 +23,11 @@ class HBaseMetaRetrieval(table: Table, familyName: String) extends MetaRetrieval
 
 object HBaseMetaRetrieval {
 
-  def toAddress(result: Array[Byte]): Address = Address.fromP2SHHash(networkParams, result)
+  def toAddress(result: Array[Byte]): PubKey = {
+    val ois = new ObjectInputStream(new ByteArrayInputStream(result))
+    val obj = ois.readObject().asInstanceOf[PubKey]
+    ois.close()
+    obj
+  }
 
 }

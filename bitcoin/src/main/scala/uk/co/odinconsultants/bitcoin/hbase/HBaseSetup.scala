@@ -17,7 +17,9 @@ object HBaseSetup {
     val tableDescriptor = new HTableDescriptor(tableName)
     val colDescriptor   = new HColumnDescriptor(familyName)
     tableDescriptor.addFamily(colDescriptor)
-    admin.createTable(tableDescriptor)
+    if (!admin.tableExists(tableName)) {
+      admin.createTable(tableDescriptor)
+    }
   }
 
 }
