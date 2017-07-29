@@ -17,23 +17,29 @@ import uk.co.odinconsultants.bitcoin.parsing.Indexer._
 @RunWith(classOf[JUnitRunner])
 class HadoopSparkIntegrationTestSpec extends WordSpec with Matchers with MiniHadoopClusterRunning {
 
-  "Hadoop mini cluster" should {
-    "hold Hadoop files" in {
-      val hdfsFile = copyToHdfs(localFile("multiblock.blk"))
+  "Copied file to HDFS" should {
+    val hdfsFile = copyToHdfs(localFile("multiblock.blk"))
 
+    "be possible" in {
       val files = list("/")
       files should have size 1
+    }
 
-      val rdd = sc.newAPIHadoopFile(hdfsFile.toString, classOf[BitcoinBlockFileInputFormat], classOf[BytesWritable], classOf[BitcoinBlock], conf)
+    val rdd = sc.newAPIHadoopFile(hdfsFile.toString, classOf[BitcoinBlockFileInputFormat], classOf[BytesWritable], classOf[BitcoinBlock], conf)
+    "allow Spark to use it" in {
       rdd.count() should be > 0L
+    }
 
-      val outputs = index(rdd)
+    val outputs = index(rdd)
+    "not generated dupes when indexed" in {
       outputs.count() should be > 0L
       val dupes = outputs.map(_ -> 1).reduceByKey(_ + _).filter(_._2 > 1).collect()
       withClue(s"\n${dupes.mkString("\n")}\n") {
         dupes shouldBe empty
       }
+    }
 
+    "have its metadata persisted in HBase" in {
       createAddressesTable(admin)
       write(outputs, () => getConnection(utility.getConfiguration))
 
@@ -44,7 +50,6 @@ class HadoopSparkIntegrationTestSpec extends WordSpec with Matchers with MiniHad
         withClue(s"\nWrote = $pubKey (${pubKey.getHash160.mkString(",")})\nRead = $actual (${actual.getHash160.mkString(",")})\n") {
           actual shouldEqual pubKey
         }
-        println(s"$actual matches $pubKey")
       }
     }
   }

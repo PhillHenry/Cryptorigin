@@ -24,8 +24,6 @@ class HBaseMetaStore(table: Table, familyName: String) extends MetaStore with Lo
       val (hash, index)               = backReference
       val key                         = append(hash, index)
       val aPut                        = new Put(key)
-      println(s"PH: Adding ${key.array.deep} -> ${publicKey.getHash160.mkString(",")} ($publicKey)")
-
       aPut.addColumn(familyNameAsBytes, emptyByteArray, serialize(publicKey))
     }
     table.put(puts)
