@@ -19,7 +19,7 @@ object Indexer {
   val networkParams: MainNetParams = MainNetParams.get()
 
   def index(rdd: RDD[(BytesWritable, BitcoinBlock)]): RDD[Payload] =
-    rdd.flatMap{ case(_, block) => toTransactions(block).map(x => (block, x)) }.flatMap { case (block, tx) => toBackReferenceAddressTuples(block, tx) }
+    rdd.flatMap{ case(_, block) => toTransactions(block) }.flatMap(toBackReferenceAddressTuples)
 
   def write(rdd: RDD[Payload], connectionFactory: () => Connection): Unit = {
     val batchSize = 100

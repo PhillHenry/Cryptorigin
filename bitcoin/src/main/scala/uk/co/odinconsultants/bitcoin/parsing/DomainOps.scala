@@ -29,8 +29,7 @@ object DomainOps {
     else None
   }
 
-  val toBackReferenceAddressTuples: (BitcoinBlock, BitcoinTransaction) => Seq[(BackReference, PubKey)] = { case (block, tx) =>
-//    val hash = toHash(block)
+  val toBackReferenceAddressTuples: (BitcoinTransaction) => Seq[(BackReference, PubKey)] = { tx =>
     val hash = hashOf(tx)
     tx.getListOfOutputs.zipWithIndex.flatMap { case (out, i) => toOutputAddress(out).map(addr => (hash, i.toLong) -> addr) }
   }
