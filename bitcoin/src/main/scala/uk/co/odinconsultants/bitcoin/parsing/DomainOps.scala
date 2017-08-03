@@ -1,5 +1,7 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
+import org.bitcoinj.core.Utils
+import org.bitcoinj.core.Utils.sha256hash160
 import org.bitcoinj.script.Script
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil.getTransactionHash
 import org.zuinnote.hadoop.bitcoin.format.common._
@@ -22,11 +24,20 @@ object DomainOps {
   def hashOf(tx: BitcoinTransaction): Array[Byte] = getTransactionHash(tx)
 
   val toOutputAddress: (BitcoinTransactionOutput) => TraversableOnce[PubKey] = { case (txOutput) =>
-    val script = new Script(txOutput.getTxOutScript)
+    val bytes = txOutput.getTxOutScript
+    toPublicKey(bytes)
+  }
 
-    if (script.isSentToAddress) Some(script.getToAddress(networkParams).getHash160)
-    else if (script.isPayToScriptHash) Some(script.getToAddress(networkParams).getHash160)
-    else None
+  def toPublicKey(bytes: Array[Byte]): Option[Array[Byte]] = {
+    if (bytes.length == 67 && bytes(0) == 65) {
+      Some(sha256hash160(bytes.tail))
+    } else {
+      val script = new Script(bytes)
+
+      if (script.isSentToAddress) Some(script.getToAddress(networkParams).getHash160)
+      else if (script.isPayToScriptHash) Some(script.getToAddress(networkParams).getHash160)
+      else None
+    }
   }
 
   val toBackReferenceAddressTuples: (BitcoinTransaction) => Seq[(BackReference, PubKey)] = { tx =>
