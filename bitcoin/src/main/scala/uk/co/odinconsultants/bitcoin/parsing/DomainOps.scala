@@ -24,8 +24,8 @@ object DomainOps {
   val toOutputAddress: (BitcoinTransactionOutput) => TraversableOnce[PubKey] = { case (txOutput) =>
     val script = new Script(txOutput.getTxOutScript)
 
-    if (script.isSentToAddress) Some(script.getToAddress(networkParams))
-    else if (script.isPayToScriptHash) Some(script.getToAddress(networkParams))
+    if (script.isSentToAddress) Some(script.getToAddress(networkParams).getHash160)
+    else if (script.isPayToScriptHash) Some(script.getToAddress(networkParams).getHash160)
     else None
   }
 

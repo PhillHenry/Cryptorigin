@@ -47,7 +47,7 @@ class HadoopSparkIntegrationTestSpec extends WordSpec with Matchers with MiniHad
       outputs.collect().foreach { payload =>
         val (backReference, pubKey) = payload
         val actual                  = reader(backReference)
-        withClue(s"\nWrote = $pubKey (${pubKey.getHash160.mkString(",")})\nRead = $actual (${actual.getHash160.mkString(",")})\n") {
+        withClue(s"\nWrote = $pubKey (${pubKey.mkString(",")})\nRead = $actual (${actual.mkString(",")})\n") {
           actual shouldEqual pubKey
         }
       }

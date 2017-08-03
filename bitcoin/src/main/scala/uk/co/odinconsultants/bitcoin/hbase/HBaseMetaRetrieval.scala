@@ -1,33 +1,16 @@
 package uk.co.odinconsultants.bitcoin.hbase
 
-import java.io.{ByteArrayInputStream, ObjectInputStream}
-
 import org.apache.hadoop.hbase.client.{Get, Table}
 import uk.co.odinconsultants.bitcoin.parsing.Indexer._
 import uk.co.odinconsultants.bitcoin.parsing.MetaRetrieval
 
 class HBaseMetaRetrieval(table: Table, familyName: String) extends MetaRetrieval {
 
-  import HBaseMetaRetrieval._
-
   override def apply(backReference: BackReference): PubKey = {
     val (hash, index) = backReference
     val key           = HBaseMetaStore.append(hash, index)
     val aGet          = new Get(key.array())
-    val result        = table.get(aGet)
-    val address       = toAddress(result.value)
-    address
-  }
-
-}
-
-object HBaseMetaRetrieval {
-
-  def toAddress(result: Array[Byte]): PubKey = {
-    val ois = new ObjectInputStream(new ByteArrayInputStream(result))
-    val obj = ois.readObject().asInstanceOf[PubKey]
-    ois.close()
-    obj
+    table.get(aGet).value()
   }
 
 }

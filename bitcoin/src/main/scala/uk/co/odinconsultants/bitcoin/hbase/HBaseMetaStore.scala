@@ -24,7 +24,7 @@ class HBaseMetaStore(table: Table, familyName: String) extends MetaStore with Lo
       val (hash, index)               = backReference
       val key                         = append(hash, index)
       val aPut                        = new Put(key)
-      aPut.addColumn(familyNameAsBytes, emptyByteArray, serialize(publicKey))
+      aPut.addColumn(familyNameAsBytes, emptyByteArray, publicKey)
     }
     table.put(puts)
   }
@@ -39,15 +39,6 @@ object HBaseMetaStore {
     byteBuffer.putLong(index)
     byteBuffer.flip()
     byteBuffer
-  }
-
-  def serialize(publicKey: PubKey): Array[Byte] = {
-    val aos = new ByteArrayOutputStream()
-    val oos = new ObjectOutputStream(aos)
-    oos.writeObject(publicKey)
-    val bytes = aos.toByteArray
-    oos.close()
-    bytes
   }
 
 }

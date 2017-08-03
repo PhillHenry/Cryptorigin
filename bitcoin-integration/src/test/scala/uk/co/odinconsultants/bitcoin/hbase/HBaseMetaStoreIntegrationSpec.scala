@@ -17,13 +17,13 @@ class HBaseMetaStoreIntegrationSpec extends WordSpec with Matchers with HBaseRun
       val table           = connection.getTable(metaTable)
 
       val inserter        = new HBaseMetaStore(connection.getTable(metaTable), familyName)
-      val metadatum       = ((hash, index), expectedAddress)
+      val metadatum       = ((hash, index), rawAddress)
       val metadata        = List(metadatum)
       inserter(metadata)
 
       val selector        = new HBaseMetaRetrieval(table, familyName)
       val actualAddress   = selector(hash, index)
-      actualAddress shouldEqual expectedAddress
+      actualAddress shouldEqual rawAddress
     }
   }
 

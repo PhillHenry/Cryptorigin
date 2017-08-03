@@ -3,7 +3,6 @@ package uk.co.odinconsultants.bitcoin.parsing
 import org.apache.hadoop.hbase.client.Connection
 import org.apache.hadoop.io.BytesWritable
 import org.apache.spark.rdd.RDD
-import org.bitcoinj.core._
 import org.bitcoinj.params.MainNetParams
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock
 import uk.co.odinconsultants.bitcoin.hbase.HBaseMetaStore
@@ -13,7 +12,7 @@ import uk.co.odinconsultants.bitcoin.parsing.MetaStore.Payload
 
 object Indexer {
 
-  type PubKey         = Address
+  type PubKey         = Array[Byte]
   type BackReference  = (Array[Byte], Long)
 
   val networkParams: MainNetParams = MainNetParams.get()

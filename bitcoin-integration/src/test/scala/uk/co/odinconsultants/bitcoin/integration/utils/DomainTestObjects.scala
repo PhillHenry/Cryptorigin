@@ -9,6 +9,5 @@ object DomainTestObjects {
   val hash: Array[Byte]         = toBytes("rowkey1")
   val index: Long               = 42
   val rawAddress: Array[Byte]   = Array.fill(20)(0.toByte)
-  val expectedAddress: Address  = new Address(Indexer.networkParams, rawAddress)
 
 }
