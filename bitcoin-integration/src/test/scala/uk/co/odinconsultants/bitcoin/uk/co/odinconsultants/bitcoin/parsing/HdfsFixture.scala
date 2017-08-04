@@ -22,7 +22,7 @@ trait HdfsFixture extends MiniHadoopClusterRunning with Matchers with Logging { 
     val hdfsFile = copyToHdfs(localFile(filename))
 
     "be possible" in {
-      val files = list("/")
+      val files = list(dir)
       files should have size 1
     }
 

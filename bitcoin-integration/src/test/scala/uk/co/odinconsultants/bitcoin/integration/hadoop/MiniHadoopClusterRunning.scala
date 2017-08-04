@@ -12,6 +12,7 @@ trait MiniHadoopClusterRunning extends Logging {
 
   val distributedFS: DistributedFileSystem  = hdfsCluster.getFileSystem
   val conf: Configuration                   = HadoopForTesting.conf
+  val dir                                   = s"/${this.getClass.getSimpleName}/"
 
   def list(path: String): List[Path] = {
     info(s"Looking in $path")
@@ -29,7 +30,8 @@ trait MiniHadoopClusterRunning extends Logging {
 
   def copyToHdfs(inputFile: Path): Path = {
     val fromFile  = inputFile.getName
-    val toFile    = new Path("/" + fromFile)
+    distributedFS.mkdirs(new Path(dir))
+    val toFile    = new Path(dir + fromFile)
     info(s"Copying '$fromFile' to '$toFile' (${toFile.getName})")
     distributedFS.copyFromLocalFile(false, true, inputFile, toFile)
     toFile
