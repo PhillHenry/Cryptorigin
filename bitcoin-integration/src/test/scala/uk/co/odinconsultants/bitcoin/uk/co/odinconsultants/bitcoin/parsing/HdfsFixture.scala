@@ -1,24 +1,25 @@
 package uk.co.odinconsultants.bitcoin.uk.co.odinconsultants.bitcoin.parsing
 
 import org.apache.hadoop.io.BytesWritable
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock
 import org.zuinnote.hadoop.bitcoin.format.mapreduce.BitcoinBlockFileInputFormat
+import uk.co.odinconsultants.bitcoin.core.Logging
 import uk.co.odinconsultants.bitcoin.hbase.HBaseMetaRetrieval
-import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup._
+import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup.{createAddressesTable, familyName, metaTable}
 import uk.co.odinconsultants.bitcoin.integration.hadoop.MiniHadoopClusterRunning
 import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseForTesting.{admin, utility}
 import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseTestConfig.getConnection
 import uk.co.odinconsultants.bitcoin.integration.spark.SparkForTesting.sc
-import uk.co.odinconsultants.bitcoin.parsing.Indexer._
+import uk.co.odinconsultants.bitcoin.parsing.Indexer.{index, write}
 
-@RunWith(classOf[JUnitRunner])
-class HadoopSparkIntegrationTestSpec extends WordSpec with Matchers with MiniHadoopClusterRunning {
+trait HdfsFixture extends MiniHadoopClusterRunning with Matchers with Logging { this: WordSpec =>
+
+  def filename: String
 
   "Copied file to HDFS" should {
-    val hdfsFile = copyToHdfs(localFile("multiblock.blk"))
+    info(s"Using blockchain file: '$filename'")
+    val hdfsFile = copyToHdfs(localFile(filename))
 
     "be possible" in {
       val files = list("/")
@@ -53,5 +54,4 @@ class HadoopSparkIntegrationTestSpec extends WordSpec with Matchers with MiniHad
       }
     }
   }
-
 }

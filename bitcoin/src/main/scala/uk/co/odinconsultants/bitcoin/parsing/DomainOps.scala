@@ -1,6 +1,5 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
-import org.bitcoinj.core.Utils
 import org.bitcoinj.core.Utils.sha256hash160
 import org.bitcoinj.script.Script
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil.getTransactionHash
