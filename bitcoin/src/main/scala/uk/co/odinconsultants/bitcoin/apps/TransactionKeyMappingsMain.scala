@@ -3,8 +3,7 @@ package uk.co.odinconsultants.bitcoin.apps
 import org.apache.spark.{SparkConf, SparkContext}
 import uk.co.odinconsultants.bitcoin.apps.SparkBlockChain.blockChainRdd
 import uk.co.odinconsultants.bitcoin.core.Logging
-import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup
-import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup.connection
+import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup._
 import uk.co.odinconsultants.bitcoin.parsing.Indexer.{index, write}
 
 object TransactionKeyMappingsMain extends Logging {
@@ -19,11 +18,14 @@ object TransactionKeyMappingsMain extends Logging {
   }
 
   def process(config: KeyMappingConfig): Unit = {
-    if (config.refresh) {
-      val conn = HBaseSetup.connection()
-      HBaseSetup.createAddressesTable(conn.getAdmin)
-      conn.close()
+    val conn  = connection()
+    val admin = conn.getAdmin
+    if (tableExists(metaTable, admin)) {
+      if (config.refresh) {
+        createAddressesTable(admin)
+      }
     }
+    conn.close()
     indexTransactions(sparkContext, config)
   }
 
