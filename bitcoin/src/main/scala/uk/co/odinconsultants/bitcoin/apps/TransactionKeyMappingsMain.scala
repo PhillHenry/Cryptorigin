@@ -1,6 +1,5 @@
 package uk.co.odinconsultants.bitcoin.apps
 
-import org.apache.hadoop.hbase.client.Connection
 import org.apache.spark.{SparkConf, SparkContext}
 import uk.co.odinconsultants.bitcoin.apps.SparkBlockChain.blockChainRdd
 import uk.co.odinconsultants.bitcoin.core.Logging
