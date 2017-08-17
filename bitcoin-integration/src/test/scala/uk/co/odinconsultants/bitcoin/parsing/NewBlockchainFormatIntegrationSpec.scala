@@ -1,4 +1,4 @@
-package uk.co.odinconsultants.bitcoin.uk.co.odinconsultants.bitcoin.parsing
+package uk.co.odinconsultants.bitcoin.parsing
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner

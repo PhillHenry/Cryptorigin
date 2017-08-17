@@ -8,9 +8,8 @@ object TransactionKeyMappingsMain extends Logging {
 
   def main(args: Array[String]): Unit = {
     parse(args) match {
-      case Some(c) => process(c)
-      case None =>
-        error(s"Cannot parse ${args.mkString(", ")}")
+      case Some(c)  => process(c)
+      case None     => error(s"Cannot parse ${args.mkString(", ")}")
     }
   }
 
