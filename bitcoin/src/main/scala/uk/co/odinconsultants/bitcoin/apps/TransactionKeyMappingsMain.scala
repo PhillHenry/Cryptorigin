@@ -1,5 +1,6 @@
 package uk.co.odinconsultants.bitcoin.apps
 
+import org.apache.hadoop.hbase.client.Connection
 import org.apache.spark.{SparkConf, SparkContext}
 import uk.co.odinconsultants.bitcoin.apps.SparkBlockChain.blockChainRdd
 import uk.co.odinconsultants.bitcoin.core.Logging
@@ -19,12 +20,7 @@ object TransactionKeyMappingsMain extends Logging {
 
   def process(config: KeyMappingConfig): Unit = {
     val conn  = connection()
-    val admin = conn.getAdmin
-    if (tableExists(metaTable, admin)) {
-      if (config.refresh) {
-        createAddressesTable(admin)
-      }
-    }
+    prepareMetaTable(config.refresh, conn)
     conn.close()
     indexTransactions(sparkContext, config)
   }
@@ -36,7 +32,7 @@ object TransactionKeyMappingsMain extends Logging {
   }
 
   def indexTransactions(sc: SparkContext, config: KeyMappingConfig): Unit = {
-    val rdd = blockChainRdd(sc, config.url, sc.hadoopConfiguration)
+    val rdd     = blockChainRdd(sc, config.url, sc.hadoopConfiguration)
     val outputs = index(rdd)
     write(outputs, () => connection())
   }

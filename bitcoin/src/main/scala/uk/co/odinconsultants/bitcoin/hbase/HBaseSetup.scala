@@ -29,6 +29,18 @@ object HBaseSetup extends Logging {
     info(s"Deleted $name")
   }
 
+  def prepareMetaTable(refresh: Boolean, conn: Connection): Unit = {
+    val admin = conn.getAdmin
+    if (tableExists(metaTable, admin)) {
+      if (refresh) {
+        dropTable(metaTable, admin)
+        createAddressesTable(admin)
+      }
+    } else {
+      createAddressesTable(admin)
+    }
+  }
+
   def toTableName(name: String): TableName = TableName.valueOf(name)
 
   def createAddressesTable(admin: Admin): Unit =

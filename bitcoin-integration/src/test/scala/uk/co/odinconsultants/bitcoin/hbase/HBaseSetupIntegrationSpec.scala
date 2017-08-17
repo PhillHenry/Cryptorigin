@@ -7,7 +7,7 @@ class HBaseSetupIntegrationSpec extends WordSpec with Matchers {
 
   import HBaseSetup._
 
-  val testTableName = System.currentTimeMillis().toString
+  val testTableName: String = System.currentTimeMillis().toString
 
   "A table that we have not created" should {
     "not exist" in {
@@ -20,9 +20,18 @@ class HBaseSetupIntegrationSpec extends WordSpec with Matchers {
       createTable(admin, toTableName(testTableName), familyName)
       tableExists(testTableName, admin) shouldBe true
     }
-    "then afterwards, say it doesn't" in {
+    "then afterwards, says it doesn't" in {
       dropTable(testTableName, admin)
       tableExists(testTableName, admin) shouldBe false
+    }
+  }
+
+  "Calling prepare table twice" should {
+    "not be a problem" in {
+      prepareMetaTable(refresh = true, admin.getConnection)
+      tableExists(metaTable, admin) shouldBe true
+      prepareMetaTable(refresh = true, admin.getConnection)
+      tableExists(metaTable, admin) shouldBe true
     }
   }
 
