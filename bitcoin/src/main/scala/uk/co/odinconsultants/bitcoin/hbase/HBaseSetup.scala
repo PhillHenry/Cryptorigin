@@ -1,7 +1,7 @@
 package uk.co.odinconsultants.bitcoin.hbase
 
+import org.apache.hadoop.hbase.client.{Admin, Connection, ConnectionFactory}
 import org.apache.hadoop.hbase.{HColumnDescriptor, HTableDescriptor, TableName}
-import org.apache.hadoop.hbase.client.HBaseAdmin
 
 object HBaseSetup {
 
@@ -9,11 +9,12 @@ object HBaseSetup {
   val tableName: TableName = TableName.valueOf(metaTable)
   val familyName: String  = "familyName"
 
-  def createAddressesTable(admin: HBaseAdmin): Unit = {
-    createTable(admin, metaTable, familyName)
-  }
+  def connection(): Connection = ConnectionFactory.createConnection()
 
-  private def createTable(admin: HBaseAdmin, tableName: String, familyName: String): Unit = {
+  def createAddressesTable(admin: Admin): Unit =
+    createTable(admin, tableName, familyName)
+
+  private def createTable(admin: Admin, tableName: TableName, familyName: String): Unit = {
     val tableDescriptor = new HTableDescriptor(tableName)
     val colDescriptor   = new HColumnDescriptor(familyName)
     tableDescriptor.addFamily(colDescriptor)

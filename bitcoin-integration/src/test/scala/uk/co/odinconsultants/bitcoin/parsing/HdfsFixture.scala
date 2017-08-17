@@ -1,9 +1,7 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
-import org.apache.hadoop.io.BytesWritable
 import org.scalatest.{Matchers, WordSpec}
-import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock
-import org.zuinnote.hadoop.bitcoin.format.mapreduce.BitcoinBlockFileInputFormat
+import uk.co.odinconsultants.bitcoin.apps.SparkBlockChain.blockChainRdd
 import uk.co.odinconsultants.bitcoin.core.Logging
 import uk.co.odinconsultants.bitcoin.hbase.HBaseMetaRetrieval
 import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup.{createAddressesTable, familyName, metaTable}
@@ -23,10 +21,11 @@ trait HdfsFixture extends MiniHadoopClusterRunning with Matchers with Logging { 
 
     "be possible" in {
       val files = list(dir)
+      info(s"Files = ${files.mkString(", ")}")
       files should have size 1
     }
 
-    val rdd = sc.newAPIHadoopFile(hdfsFile.toString, classOf[BitcoinBlockFileInputFormat], classOf[BytesWritable], classOf[BitcoinBlock], conf)
+    val rdd = blockChainRdd(sc, hdfsFile.toString, conf)
     "allow Spark to use it" in {
       rdd.count() should be > 0L
     }

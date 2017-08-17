@@ -13,4 +13,14 @@ class TransactionKeyMappingsConfSpec extends WordSpec with Matchers {
     }
   }
 
+  "Refresh argument" should {
+    "be parsed" in {
+      val configOpt = parse(Array("-r"))
+      configOpt shouldBe Some(KeyMappingConfig().copy(refresh = true))
+    }
+    "default to false" in {
+      KeyMappingConfig().refresh shouldBe false
+    }
+  }
+
 }
