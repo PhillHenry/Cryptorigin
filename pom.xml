@@ -71,17 +71,6 @@
   </dependencies>
 
   <build>
-    <sourceDirectory>src/main/</sourceDirectory>
-    <testSourceDirectory>src/test/</testSourceDirectory>
-    <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-          <exclude>**/*.scala</exclude>
-        </excludes>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <!-- see http://davidb.github.com/scala-maven-plugin -->

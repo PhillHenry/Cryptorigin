@@ -41,6 +41,8 @@ object DomainOps extends Logging {
 
   /**
     * @see http://codesuppository.blogspot.co.at/2014/01/how-to-parse-bitcoin-blockchain.html
+    * Still throwing:
+    * org.bitcoinj.core.ScriptException: Could not convert script of length 39. Bytes (as hex) are 6a06ceb34443031d2023b030fb3be4df32e4516fa572294f7af98ff77df89ddc24becc3c53d895
     */
   def toPublicKey(bytes: Array[Byte]): Option[Array[Byte]] = {
     if (bytes.length < 25) {
