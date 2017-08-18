@@ -5,10 +5,11 @@ import org.apache.hadoop.io.BytesWritable
 import org.apache.spark.rdd.RDD
 import org.bitcoinj.params.MainNetParams
 import org.zuinnote.hadoop.bitcoin.format.common.{BitcoinBlock, BitcoinTransaction}
-import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup.{familyName, tableName}
 import uk.co.odinconsultants.bitcoin.hbase.{HBaseMetaRetrieval, HBaseMetaStore}
+import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup.{familyName, tableName}
 import uk.co.odinconsultants.bitcoin.parsing.DomainOps._
 import uk.co.odinconsultants.bitcoin.parsing.MetaStore.Payload
+import util.hash.MurmurHash3
 
 import scala.collection.JavaConversions._
 
