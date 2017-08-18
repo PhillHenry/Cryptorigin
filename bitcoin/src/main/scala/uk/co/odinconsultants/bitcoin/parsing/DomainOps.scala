@@ -56,8 +56,7 @@ object DomainOps extends Logging {
     } else try {
       val script = new Script(bytes)
 
-      if (script.isSentToAddress) Some(script.getToAddress(networkParams).getHash160)
-      else if (script.isPayToScriptHash) Some(script.getToAddress(networkParams).getHash160)
+      if (script.isSentToAddress || script.isPayToScriptHash) Some(script.getToAddress(networkParams).getHash160)
       else None
     } catch {
       case x: ScriptException =>
