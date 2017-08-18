@@ -35,4 +35,10 @@ object Indexer {
     }
   }
 
+  def toGraph(rdd: RDD[Payload], connectionFactory: () => Connection): Unit = {
+    rdd.mapPartitions { iter =>
+      ???
+    }
+  }
+
 }

@@ -22,8 +22,9 @@ class HBaseMetaStoreIntegrationSpec extends WordSpec with Matchers with HBaseRun
       inserter(metadata)
 
       val selector        = new HBaseMetaRetrieval(table, familyName)
-      val actualAddress   = selector(hash, index)
-      actualAddress shouldEqual rawAddress
+      val actualAddress   = selector(List((hash, index)))
+      actualAddress.size shouldBe 1
+      actualAddress.head shouldEqual rawAddress
     }
   }
 

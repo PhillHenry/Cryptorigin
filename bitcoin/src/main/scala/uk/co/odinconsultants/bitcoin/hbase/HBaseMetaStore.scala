@@ -13,8 +13,8 @@ class HBaseMetaStore(table: Table, familyName: String) extends MetaStore with Lo
 
   val familyNameAsBytes: Array[Byte] = toBytes(familyName)
 
-  def apply(payload: Batch): Unit = {
-    val puts = payload.map { case (backReference, publicKey) =>
+  def apply(batch: Batch): Unit = {
+    val puts = batch.map { case (backReference, publicKey) =>
       val (hash, index)               = backReference
       val key                         = DomainOps.append(hash, index)
       val aPut                        = new Put(key)

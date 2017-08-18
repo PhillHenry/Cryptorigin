@@ -46,9 +46,10 @@ trait HdfsFixture extends MiniHadoopClusterRunning with Matchers with Logging { 
       val reader = new HBaseMetaRetrieval(admin.getConnection.getTable(metaTable), familyName)
       outputs.collect().foreach { payload =>
         val (backReference, pubKey) = payload
-        val actual                  = reader(backReference)
+        val actual                  = reader(List(backReference))
         withClue(s"\nWrote = $pubKey (${pubKey.mkString(",")})\nRead = $actual (${actual.mkString(",")})\n") {
-          actual shouldEqual pubKey
+          actual.size shouldBe 1
+          actual.head shouldEqual pubKey
         }
       }
     }
