@@ -4,11 +4,14 @@ import org.apache.hadoop.hbase.client.Connection
 import org.apache.hadoop.io.BytesWritable
 import org.apache.spark.rdd.RDD
 import org.bitcoinj.params.MainNetParams
-import org.zuinnote.hadoop.bitcoin.format.common.BitcoinBlock
-import uk.co.odinconsultants.bitcoin.hbase.HBaseMetaStore
+import org.zuinnote.hadoop.bitcoin.format.common.{BitcoinBlock, BitcoinTransaction}
+import uk.co.odinconsultants.bitcoin.hbase.{HBaseMetaRetrieval, HBaseMetaStore}
 import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup.{familyName, tableName}
 import uk.co.odinconsultants.bitcoin.parsing.DomainOps._
 import uk.co.odinconsultants.bitcoin.parsing.MetaStore.Payload
+import util.hash.MurmurHash3
+
+import scala.collection.JavaConversions._
 
 object Indexer {
 
@@ -35,10 +38,35 @@ object Indexer {
     }
   }
 
-  def toGraph(rdd: RDD[Payload], connectionFactory: () => Connection): Unit = {
-    rdd.mapPartitions { iter =>
-      ???
+  /**
+    * TODO not used yet. Refactor and test. This is just a brain dump.
+    */
+  def toGraph(rdd: RDD[BitcoinTransaction], connectionFactory: () => Connection): RDD[(Long, Long)] = {
+    rdd.mapPartitions { txs =>
+      val connection  = connectionFactory()
+      val table       = connection.getTable(tableName)
+      val metaStore   = new HBaseMetaRetrieval(table, familyName)
+
+      val payments = txs.flatMap { tx =>
+        val inputs = tx.getListOfInputs
+        val backRefs = inputs.map { i =>
+          (i.getPrevTransactionHash, i.getPreviousTxOutIndex)
+        }
+        val pkInputs = metaStore(backRefs.toList)
+
+        val pkOutputs = toBackReferenceAddressTuples(tx)
+
+        val inIds = pkInputs.map(hashed)
+        val outIds = pkOutputs.map(o => hashed(o._2))
+        inIds.flatMap { in =>
+          outIds.map(out => (in, out))
+        }
+      }
+      connection.close()
+      payments
     }
   }
+
+  def hashed(bytes: Array[Byte]): Long = ???
 
 }
