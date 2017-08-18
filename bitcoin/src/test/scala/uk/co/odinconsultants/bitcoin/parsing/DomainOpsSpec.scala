@@ -30,4 +30,11 @@ class DomainOpsSpec extends WordSpec with Matchers {
       append(emptyByteArray, 42L).array should have length 8
     }
   }
+
+  "Problematic address" should {
+    "be neutralized" in {
+      val bytes = org.apache.commons.codec.binary.Hex.decodeHex("6a06ceb34443031d2023b030fb3be4df32e4516fa572294f7af98ff77df89ddc24becc3c53d895".toCharArray)
+      toPublicKey(bytes) shouldBe None
+    }
+  }
 }

@@ -5,12 +5,14 @@ import java.nio.ByteBuffer
 import org.bitcoinj.core.ScriptException
 import org.bitcoinj.core.Utils.sha256hash160
 import org.bitcoinj.script.Script
+import org.bitcoinj.script.ScriptOpCodes._
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil.getTransactionHash
 import org.zuinnote.hadoop.bitcoin.format.common._
 import uk.co.odinconsultants.bitcoin.core.Logging
 import uk.co.odinconsultants.bitcoin.parsing.Indexer.{BackReference, PubKey, networkParams}
 
 import scala.collection.JavaConversions._
+import scala.util.Try
 
 object DomainOps extends Logging {
 
@@ -55,11 +57,16 @@ object DomainOps extends Logging {
       Some(sha256hash160(bytes.tail.take(65)))
     } else if (bytes.length == 66) {
       Some(sha256hash160(bytes.take(65)))
+    } else if (beginsSensibly(bytes) && bytes(23) == OP_EQUALVERIFY && bytes(24) == OP_CHECKSIG) {
+      Some(sha256hash160(bytes.slice(3, 23)))
+//    } else if (beginsSensibly(bytes)) { // not sure about this as the source (John Ratcliff) is somewhat inconsistent
+//      Some(sha256hash160(bytes.slice(3, 23)))
     } else try {
-      val script = new Script(bytes)
-
-      if (script.isSentToAddress || script.isPayToScriptHash) Some(script.getToAddress(networkParams).getHash160)
-      else None
+      val tried = Try {
+        val script = new Script(bytes)
+        Some(script.getToAddress(networkParams).getHash160)
+      }
+      tried.getOrElse(None)
     } catch {
       case x: ScriptException =>
         val msg = s"Could not convert script of length ${bytes.length}. Bytes (as hex) are ${toHex(bytes)}"
@@ -67,6 +74,8 @@ object DomainOps extends Logging {
         throw new ScriptException(msg, x)
     }
   }
+
+  def beginsSensibly(bytes: Array[Byte]): Boolean = bytes(0) == OP_DUP && bytes(1) == OP_HASH160 && bytes(2) == 20
 
   def toHex(bytes: Array[Byte]): String = new String(org.apache.commons.codec.binary.Hex.encodeHex(bytes))
 
