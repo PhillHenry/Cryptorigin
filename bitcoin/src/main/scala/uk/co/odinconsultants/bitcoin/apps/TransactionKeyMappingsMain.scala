@@ -7,7 +7,7 @@ import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup._
 import uk.co.odinconsultants.bitcoin.parsing.Indexer.{index, write}
 
 /**
-  * "Just as you had to build a hash map for each of the blocks, you are going to have to build a hash map for each of
+  * "you are going to have to build a hash map for each of
   * the transactions, since each input refers to the transaction hash of the previous output."
   *
   * see http://codesuppository.blogspot.co.at/2014/01/how-to-parse-bitcoin-blockchain.html
@@ -20,7 +20,7 @@ nohup ~/spark/bin/spark-submit --class uk.co.odinconsultants.bitcoin.apps.Transa
 
   (but without the slash in blocks\*.dat. That's just there to keep ScalaDoc happy.)
   */
-object TransactionKeyMappingsMain extends Logging {
+object TransactionKeyMappingsMain extends SparkClient with Logging {
 
   import TransactionKeyMappingsConf._
 
@@ -36,12 +36,6 @@ object TransactionKeyMappingsMain extends Logging {
     prepareMetaTable(config.refresh, conn)
     conn.close()
     indexTransactions(sparkContext, config)
-  }
-
-  private def sparkContext = {
-    val sparkConfig = new SparkConf()
-    sparkConfig.setAppName(this.getClass.getSimpleName)
-    new SparkContext(sparkConfig)
   }
 
   def indexTransactions(sc: SparkContext, config: KeyMappingConfig): Unit = {

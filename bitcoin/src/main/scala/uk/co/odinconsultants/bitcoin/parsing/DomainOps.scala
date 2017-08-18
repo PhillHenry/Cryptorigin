@@ -33,16 +33,17 @@ object DomainOps extends Logging {
     * @see http://codesuppository.blogspot.co.at/2014/01/how-to-parse-bitcoin-blockchain.html
     */
   def toPublicKey(bytes: Array[Byte]): Option[Array[Byte]] = {
+    if (bytes.length < 25) {
+      // John Ratcliff says if the length of the script is 5,
+      // "This script is in error [but] it does show up in the blockchain a number of times."
+      // but I see other amounts too. No idea why.
+      error(s"Hmm. Script length of ${bytes.length}. Content as hex = ${toHex(bytes)}")
+      None
+    }
     if (bytes.length == 67 && bytes(0) == 65) {
       Some(sha256hash160(bytes.tail.take(65)))
     } else if (bytes.length == 66) {
       Some(sha256hash160(bytes.take(65)))
-    } else if (bytes.length == 5) {
-      // "This script is in error [but] it does show up in the blockchain a number of times."
-      None
-    } else if (bytes.length == 1 || bytes.length == 2) { // I've seen this but don't know why. The recent fork...?
-      error(s"Hmm. Script length of ${bytes.length}. Content as hex = ${toHex(bytes)}")
-      None
     } else try {
       val script = new Script(bytes)
 
