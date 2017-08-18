@@ -37,7 +37,10 @@ object DomainOps extends Logging {
       Some(sha256hash160(bytes.tail.take(65)))
     } else if (bytes.length == 66) {
       Some(sha256hash160(bytes.take(65)))
-    } else if (bytes.length == 5) {// "This script is in error [but] it does show up in the blockchain a number of times."
+    } else if (bytes.length == 5) {
+      // "This script is in error [but] it does show up in the blockchain a number of times."
+      None
+    } else if (bytes.length == 1) { // I've seen this but don't know why. The recent fork...?
       None
     } else try {
       val script = new Script(bytes)
@@ -47,7 +50,7 @@ object DomainOps extends Logging {
       else None
     } catch {
       case x: ScriptException =>
-        val msg = s"Could not convert script of length ${bytes.length}. Bytes (as hex) are ${org.apache.commons.codec.binary.Hex.encodeHex(bytes)}"
+        val msg = s"Could not convert script of length ${bytes.length}. Bytes (as hex) are ${new String(org.apache.commons.codec.binary.Hex.encodeHex(bytes))}"
         error(msg)
         throw new ScriptException(msg, x)
     }
