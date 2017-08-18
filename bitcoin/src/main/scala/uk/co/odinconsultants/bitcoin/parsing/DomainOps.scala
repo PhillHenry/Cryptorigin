@@ -37,6 +37,8 @@ object DomainOps extends Logging {
       Some(sha256hash160(bytes.tail.take(65)))
     } else if (bytes.length == 66) {
       Some(sha256hash160(bytes.take(65)))
+    } else if (bytes.length == 5) {// "This script is in error [but] it does show up in the blockchain a number of times."
+      None
     } else try {
       val script = new Script(bytes)
 
