@@ -41,6 +41,7 @@ object DomainOps extends Logging {
       // "This script is in error [but] it does show up in the blockchain a number of times."
       None
     } else if (bytes.length == 1) { // I've seen this but don't know why. The recent fork...?
+      error(s"Hmm. Script length of ${bytes.length}. Content as hex = ${toHex(bytes)}")
       None
     } else try {
       val script = new Script(bytes)
@@ -50,11 +51,13 @@ object DomainOps extends Logging {
       else None
     } catch {
       case x: ScriptException =>
-        val msg = s"Could not convert script of length ${bytes.length}. Bytes (as hex) are ${new String(org.apache.commons.codec.binary.Hex.encodeHex(bytes))}"
+        val msg = s"Could not convert script of length ${bytes.length}. Bytes (as hex) are ${toHex(bytes)}"
         error(msg)
         throw new ScriptException(msg, x)
     }
   }
+
+  def toHex(bytes: Array[Byte]): String = new String(org.apache.commons.codec.binary.Hex.encodeHex(bytes))
 
   val toBackReferenceAddressTuples: (BitcoinTransaction) => Seq[(BackReference, PubKey)] = { tx =>
     val hash = hashOf(tx)
