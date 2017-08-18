@@ -47,8 +47,9 @@ object DomainOps extends Logging {
       else None
     } catch {
       case x: ScriptException =>
-        error(s"Could not convert script of length ${bytes.length}. Bytes (as hex) are ${org.apache.commons.codec.binary.Hex.encodeHex(bytes)}")
-      throw x
+        val msg = s"Could not convert script of length ${bytes.length}. Bytes (as hex) are ${org.apache.commons.codec.binary.Hex.encodeHex(bytes)}"
+        error(msg)
+        throw new ScriptException(msg, x)
     }
   }
 
