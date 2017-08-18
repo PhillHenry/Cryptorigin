@@ -1,7 +1,8 @@
-package uk.co.odinconsultants.bitcoin.apps
+package uk.co.odinconsultants.bitcoin.apps.mappings
 
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.SparkContext
 import uk.co.odinconsultants.bitcoin.apps.SparkBlockChain.blockChainRdd
+import uk.co.odinconsultants.bitcoin.apps.SparkClient
 import uk.co.odinconsultants.bitcoin.core.Logging
 import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup._
 import uk.co.odinconsultants.bitcoin.parsing.Indexer.{index, write}

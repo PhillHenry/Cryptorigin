@@ -1,4 +1,4 @@
-package uk.co.odinconsultants.bitcoin.apps
+package uk.co.odinconsultants.bitcoin.apps.mappings
 
 object TransactionKeyMappingsConf {
 

@@ -1,5 +1,7 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
+import java.nio.ByteBuffer
+
 import org.bitcoinj.core.ScriptException
 import org.bitcoinj.core.Utils.sha256hash160
 import org.bitcoinj.script.Script
@@ -20,6 +22,14 @@ object DomainOps extends Logging {
 
   val toBackReference: (BitcoinTransactionInput) => BackReference = { in =>
     (in.getPrevTransactionHash, in.getPreviousTxOutIndex)
+  }
+
+  def append(hash: Array[Byte], index: Long): ByteBuffer = {
+    val byteBuffer = ByteBuffer.allocate(hash.length + 8)
+    byteBuffer.put(hash)
+    byteBuffer.putLong(index)
+    byteBuffer.flip()
+    byteBuffer
   }
 
   def hashOf(tx: BitcoinTransaction): Array[Byte] = getTransactionHash(tx)

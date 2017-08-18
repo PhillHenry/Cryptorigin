@@ -2,6 +2,8 @@ package uk.co.odinconsultants.bitcoin.parsing
 
 import org.scalatest.{Matchers, WordSpec}
 
+import scala.Array.emptyByteArray
+
 class DomainOpsSpec extends WordSpec with Matchers {
 
   import DomainOps._
@@ -20,4 +22,9 @@ class DomainOpsSpec extends WordSpec with Matchers {
     }
   }
 
+  "appending" should {
+    "have the correct number of bytes" in {
+      append(emptyByteArray, 42L).array should have length 8
+    }
+  }
 }

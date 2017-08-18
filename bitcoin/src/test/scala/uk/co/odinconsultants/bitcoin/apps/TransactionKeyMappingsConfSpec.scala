@@ -1,7 +1,7 @@
 package uk.co.odinconsultants.bitcoin.apps
 
 import org.scalatest.{Matchers, WordSpec}
-import uk.co.odinconsultants.bitcoin.apps.TransactionKeyMappingsConf.{KeyMappingConfig, parse}
+import uk.co.odinconsultants.bitcoin.apps.mappings.TransactionKeyMappingsConf.{KeyMappingConfig, parse}
 
 class TransactionKeyMappingsConfSpec extends WordSpec with Matchers {
 
