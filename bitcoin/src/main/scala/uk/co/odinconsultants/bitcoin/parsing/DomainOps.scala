@@ -1,6 +1,6 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
-import org.bitcoinj.core.ScriptException
+import org.bitcoinj.script.ScriptException
 import org.bitcoinj.core.Utils.sha256hash160
 import org.bitcoinj.script.Script
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil.getTransactionHash
@@ -53,7 +53,7 @@ object DomainOps extends Logging {
       case x: ScriptException =>
         val msg = s"Could not convert script of length ${bytes.length}. Bytes (as hex) are ${toHex(bytes)}"
         error(msg)
-        throw new ScriptException(msg, x)
+        throw new RuntimeException(msg, x)
     }
   }
 
