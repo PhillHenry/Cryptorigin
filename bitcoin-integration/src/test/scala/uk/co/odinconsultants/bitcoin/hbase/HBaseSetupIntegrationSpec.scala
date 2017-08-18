@@ -1,8 +1,11 @@
 package uk.co.odinconsultants.bitcoin.hbase
 
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
 import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseForTesting.admin
 
+@RunWith(classOf[JUnitRunner])
 class HBaseSetupIntegrationSpec extends WordSpec with Matchers {
 
   import HBaseSetup._

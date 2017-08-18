@@ -1,8 +1,11 @@
 package uk.co.odinconsultants.bitcoin.apps
 
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
 import uk.co.odinconsultants.bitcoin.apps.mappings.TransactionKeyMappingsConf.{KeyMappingConfig, parse}
 
+@RunWith(classOf[JUnitRunner])
 class TransactionKeyMappingsConfSpec extends WordSpec with Matchers {
 
   "URL argument" should {

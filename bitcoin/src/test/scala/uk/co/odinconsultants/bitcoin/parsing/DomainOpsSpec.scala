@@ -1,9 +1,12 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
 
 import scala.Array.emptyByteArray
 
+@RunWith(classOf[JUnitRunner])
 class DomainOpsSpec extends WordSpec with Matchers {
 
   import DomainOps._
