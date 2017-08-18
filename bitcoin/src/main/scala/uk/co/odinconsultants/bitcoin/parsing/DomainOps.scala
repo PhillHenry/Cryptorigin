@@ -49,8 +49,7 @@ object DomainOps extends Logging {
       // but I see other amounts too. No idea why.
       error(s"Hmm. Script length of ${bytes.length}. Content as hex = ${toHex(bytes)}")
       None
-    }
-    if (bytes.length == 67 && bytes(0) == 65) {
+    } else if (bytes.length == 67 && bytes(0) == 65) {
       Some(sha256hash160(bytes.tail.take(65)))
     } else if (bytes.length == 66) {
       Some(sha256hash160(bytes.take(65)))
