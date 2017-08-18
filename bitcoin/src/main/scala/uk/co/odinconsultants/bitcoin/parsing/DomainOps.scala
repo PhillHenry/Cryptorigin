@@ -1,6 +1,6 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
-import org.bitcoinj.script.ScriptException
+import org.bitcoinj.core.ScriptException
 import org.bitcoinj.core.Utils.sha256hash160
 import org.bitcoinj.script.Script
 import org.zuinnote.hadoop.bitcoin.format.common.BitcoinUtil.getTransactionHash
@@ -40,7 +40,7 @@ object DomainOps extends Logging {
     } else if (bytes.length == 5) {
       // "This script is in error [but] it does show up in the blockchain a number of times."
       None
-    } else if (bytes.length == 1) { // I've seen this but don't know why. The recent fork...?
+    } else if (bytes.length == 1 || bytes.length == 2) { // I've seen this but don't know why. The recent fork...?
       error(s"Hmm. Script length of ${bytes.length}. Content as hex = ${toHex(bytes)}")
       None
     } else try {
@@ -53,7 +53,7 @@ object DomainOps extends Logging {
       case x: ScriptException =>
         val msg = s"Could not convert script of length ${bytes.length}. Bytes (as hex) are ${toHex(bytes)}"
         error(msg)
-        throw new RuntimeException(msg, x)
+        throw new ScriptException(msg, x)
     }
   }
 
