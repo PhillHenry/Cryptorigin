@@ -47,7 +47,7 @@ object DomainOps extends Logging {
     * org.bitcoinj.core.ScriptException: Could not convert script of length 39. Bytes (as hex) are 6a06ceb34443031d2023b030fb3be4df32e4516fa572294f7af98ff77df89ddc24becc3c53d895
     */
   def toPublicKey(bytes: Array[Byte]): Option[Array[Byte]] = {
-    if (bytes.length < 25) {
+    if (bytes.length < 23) {
       // John Ratcliff says if the length of the script is 5,
       // "This script is in error [but] it does show up in the blockchain a number of times."
       // but I see other amounts too. No idea why.

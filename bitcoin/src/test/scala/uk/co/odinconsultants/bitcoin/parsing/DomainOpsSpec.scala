@@ -37,4 +37,12 @@ class DomainOpsSpec extends WordSpec with Matchers {
       toPublicKey(bytes) shouldBe None
     }
   }
+
+  "Address that's 23 bytes" should {
+    "be parsed" in {
+      //a9149c79163af51f480446f5b4943d774476d305a0bb87
+      val bytes = org.apache.commons.codec.binary.Hex.decodeHex("a9149c79163af51f480446f5b4943d774476d305a0bb87".toCharArray)
+      toPublicKey(bytes) should not be None
+    }
+  }
 }
