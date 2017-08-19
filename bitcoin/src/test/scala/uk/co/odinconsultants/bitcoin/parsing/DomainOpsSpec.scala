@@ -15,6 +15,14 @@ class DomainOpsSpec extends WordSpec with Matchers {
     -88, 40, -32, 57, 9, -90, 121, 98, -32, -22, 31, 97, -34, -74, 73, -10, -68, 63, 76, -17, 56, -60, -13, 85, 4, -27,
     30, -63, 18, -34, 92, 56, 77, -9, -70, 11, -115, 87, -118, 76, 112, 43, 107, -15, 29, 95, -84)
 
+
+  "Address that's 22 bytes" should {
+    "not be parsed" in {
+      val bytes = org.apache.commons.codec.binary.Hex.decodeHex("6a134153435249424553504f4f4c434f4e5349474e".toCharArray)
+      toPublicKey(bytes) shouldBe None
+    }
+  }
+
   "Format 1 (according to http://codesuppository.blogspot.co.at/2014/01/how-to-parse-bitcoin-blockchain.html)" should {
     "be parsed" in {
       val option = toPublicKey(oldScript)
@@ -40,9 +48,9 @@ class DomainOpsSpec extends WordSpec with Matchers {
 
   "Address that's 23 bytes" should {
     "be parsed" in {
-      //a9149c79163af51f480446f5b4943d774476d305a0bb87
       val bytes = org.apache.commons.codec.binary.Hex.decodeHex("a9149c79163af51f480446f5b4943d774476d305a0bb87".toCharArray)
       toPublicKey(bytes) should not be None
     }
   }
+
 }

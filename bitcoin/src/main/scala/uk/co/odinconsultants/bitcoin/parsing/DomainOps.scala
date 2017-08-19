@@ -12,7 +12,7 @@ import uk.co.odinconsultants.bitcoin.core.Logging
 import uk.co.odinconsultants.bitcoin.parsing.Indexer.{BackReference, PubKey, networkParams}
 
 import scala.collection.JavaConversions._
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 object DomainOps extends Logging {
 
@@ -66,12 +66,12 @@ object DomainOps extends Logging {
         val script = new Script(bytes)
         Some(script.getToAddress(networkParams).getHash160)
       }
-      tried.getOrElse(None)
-    } catch {
-      case x: ScriptException =>
-        val msg = s"Could not convert script of length ${bytes.length}. Bytes (as hex) are ${toHex(bytes)}"
-        error(msg)
-        throw new ScriptException(msg, x)
+      tried match {
+        case Failure(x) =>
+          error(s"BitcoinJ could not parse ${toHex(bytes)}. Error = ${x.getMessage}")
+          None
+        case Success(x) => x
+      }
     }
   }
 
