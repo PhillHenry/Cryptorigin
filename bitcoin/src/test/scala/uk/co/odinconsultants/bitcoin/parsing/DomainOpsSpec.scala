@@ -3,6 +3,7 @@ package uk.co.odinconsultants.bitcoin.parsing
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Matchers, WordSpec}
+import org.apache.commons.codec.binary.Hex
 
 import scala.Array.emptyByteArray
 
@@ -18,7 +19,7 @@ class DomainOpsSpec extends WordSpec with Matchers {
 
   "Address that's 22 bytes" should {
     "not be parsed" in {
-      val bytes = org.apache.commons.codec.binary.Hex.decodeHex("6a134153435249424553504f4f4c434f4e5349474e".toCharArray)
+      val bytes = Hex.decodeHex("6a134153435249424553504f4f4c434f4e5349474e".toCharArray)
       toPublicKey(bytes) shouldBe None
     }
   }
@@ -41,14 +42,14 @@ class DomainOpsSpec extends WordSpec with Matchers {
 
   "Problematic address" should {
     "be neutralized" in {
-      val bytes = org.apache.commons.codec.binary.Hex.decodeHex("6a06ceb34443031d2023b030fb3be4df32e4516fa572294f7af98ff77df89ddc24becc3c53d895".toCharArray)
+      val bytes = Hex.decodeHex("6a06ceb34443031d2023b030fb3be4df32e4516fa572294f7af98ff77df89ddc24becc3c53d895".toCharArray)
       toPublicKey(bytes) shouldBe None
     }
   }
 
   "Address that's 23 bytes" should {
     "be parsed" in {
-      val bytes = org.apache.commons.codec.binary.Hex.decodeHex("a9149c79163af51f480446f5b4943d774476d305a0bb87".toCharArray)
+      val bytes = Hex.decodeHex("a9149c79163af51f480446f5b4943d774476d305a0bb87".toCharArray)
       toPublicKey(bytes) should not be None
     }
   }

@@ -43,8 +43,7 @@ object DomainOps extends Logging {
 
   /**
     * @see http://codesuppository.blogspot.co.at/2014/01/how-to-parse-bitcoin-blockchain.html
-    * Still throwing:
-    * org.bitcoinj.core.ScriptException: Could not convert script of length 39. Bytes (as hex) are 6a06ceb34443031d2023b030fb3be4df32e4516fa572294f7af98ff77df89ddc24becc3c53d895
+    * @see https://bitcointalk.org/index.php?topic=1847290.0
     */
   def toPublicKey(bytes: Array[Byte]): Option[Array[Byte]] = {
     if (bytes.length < 23) {
@@ -61,12 +60,11 @@ object DomainOps extends Logging {
       Some(sha256hash160(bytes.slice(3, 23)))
 //    } else if (beginsSensibly(bytes)) { // not sure about this as the source (John Ratcliff) is somewhat inconsistent
 //      Some(sha256hash160(bytes.slice(3, 23)))
-    } else try {
-      val tried = Try {
+    } else {
+      Try {
         val script = new Script(bytes)
         Some(script.getToAddress(networkParams).getHash160)
-      }
-      tried match {
+      } match {
         case Failure(x) =>
           error(s"BitcoinJ could not parse ${toHex(bytes)}. Error = ${x.getMessage}")
           None
