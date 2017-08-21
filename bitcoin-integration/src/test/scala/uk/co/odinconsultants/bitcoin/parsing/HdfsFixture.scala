@@ -11,7 +11,7 @@ import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseForTesting.{admin, u
 import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseTestConfig.getConnection
 import uk.co.odinconsultants.bitcoin.integration.spark.SparkForTesting.sc
 import uk.co.odinconsultants.bitcoin.parsing.DomainOps.toOutputAddress
-import uk.co.odinconsultants.bitcoin.parsing.Indexer.{index, toGraph, write}
+import uk.co.odinconsultants.bitcoin.parsing.Indexer.{index, toGraph, transactionsOf, write}
 
 import scala.collection.JavaConversions._
 
@@ -61,7 +61,7 @@ trait HdfsFixture extends MiniHadoopClusterRunning with Matchers with Logging { 
     }
 
     "be parsed using the persisted metadata" in {
-      val realTxs     = rdd.flatMap(_._2.getTransactions)
+      val realTxs     = transactionsOf(rdd)
       val rddTxsInDb  = realTxs.map(HdfsFixture.inputsPointToSelf)
       val adjacency   = toGraph(rddTxsInDb, txFactory).collect
       adjacency.length shouldBe > (realTxs.count().toInt)
