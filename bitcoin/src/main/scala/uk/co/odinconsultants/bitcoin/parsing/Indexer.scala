@@ -1,5 +1,6 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
+import org.apache.commons.codec.binary.Hex
 import org.apache.hadoop.hbase.client.Connection
 import org.apache.hadoop.io.BytesWritable
 import org.apache.spark.rdd.RDD
@@ -23,32 +24,38 @@ object Indexer {
   def index(rdd: RDD[(BytesWritable, BitcoinBlock)]): RDD[Payload] =
     rdd.flatMap{ case(_, block) => toTransactions(block) }.flatMap(toBackReferenceAddressTuples)
 
+  val batchSize = 100
+
   def write(rdd: RDD[Payload], connectionFactory: () => Connection): Unit = {
-    val batchSize = 100
     rdd.foreachPartition { iter =>
       val connection  = connectionFactory()
       val table       = connection.getTable(tableName)
       val metaStore   = new HBaseMetaStore(table, familyName)
 
       iter.grouped(batchSize).foreach { metaIter =>
-        metaStore(metaIter.toList)
+        val payloads = metaIter.toList
+//        debug(s"Storing: ${payloads.map(x => (new String(Hex.encodeHex(x._1._1)), x._1._2)).mkString(", ")}")
+        metaStore(payloads)
       }
 
       connection.close()
     }
   }
 
-  /**
-    * TODO not used yet. Refactor and test. This is just a brain dump.
-    */
   def toGraph(rdd: RDD[BitcoinTransaction], connectionFactory: () => Connection): RDD[(Long, Long)] = {
     rdd.mapPartitions { txs =>
-      val connection  = connectionFactory()
-      val table       = connection.getTable(tableName)
-      val metaStore   = new HBaseMetaRetrieval(table, familyName)
-      val payments    = txs.flatMap { cartesianProductOfIO(_, metaStore) }
-      connection.close()
-      payments
+
+      txs.grouped(batchSize).flatMap { batch =>
+        val connection  = connectionFactory()
+        val table       = connection.getTable(tableName)
+        val metaStore   = new HBaseMetaRetrieval(table, familyName)
+
+        val batched     = batch.flatMap { cartesianProductOfIO(_, metaStore) }
+
+        connection.close()
+        batched
+      }
+
     }
   }
 
@@ -58,6 +65,7 @@ object Indexer {
       (i.getPrevTransactionHash, i.getPreviousTxOutIndex)
     }
     val pkInputs  = metaStore(backRefs.toList)
+//    debug(s"Looking up: ${backRefs.map(x => (new String(Hex.encodeHex(x._1)), x._2)).mkString(", ")} got ${pkInputs.mkString(", ")}")
 
     val pkOutputs = toBackReferenceAddressTuples(tx)
 

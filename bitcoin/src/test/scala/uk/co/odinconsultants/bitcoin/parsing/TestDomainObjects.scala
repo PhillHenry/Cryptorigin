@@ -13,7 +13,7 @@ trait TestDomainObjects extends MockitoSugar {
 
   def createInputX(n: Int): Seq[BitcoinTransactionInput] = {
     val prevTxHash    = Array.fill[Byte](20)(0)
-    (1 to n).map { i =>
+    (0 until n).map { i =>
       val input         = mock[BitcoinTransactionInput]
       when(input.getPreviousTxOutIndex).thenReturn(i)
       when(input.getPrevTransactionHash).thenReturn(prevTxHash)
@@ -24,7 +24,7 @@ trait TestDomainObjects extends MockitoSugar {
   }
 
   def createOutputX(n: Int): Seq[BitcoinTransactionOutput] = {
-    (1 to n).map { i =>
+    (0 until n).map { i =>
       val output      = mock[BitcoinTransactionOutput]
       when(output.getTxOutScript).thenReturn(script(i))
       when(output.getTxOutScriptLength).thenReturn(someBytes)
