@@ -8,7 +8,7 @@ import scala.collection.JavaConversions._
 
 trait TestDomainObjects extends MockitoSugar {
 
-  val script: Array[Byte]    = Hex.decodeHex("a9149c79163af51f480446f5b4943d774476d305a0bb87".toCharArray)
+  def script(i: Int): Array[Byte]    = Hex.decodeHex("a914".toCharArray) ++ Array.fill[Byte](20)(i.toByte) ++ Hex.decodeHex("87".toCharArray)
   val someBytes: Array[Byte] = Array.fill[Byte](10)(0)
 
   def createInputX(n: Int): Seq[BitcoinTransactionInput] = {
@@ -26,7 +26,7 @@ trait TestDomainObjects extends MockitoSugar {
   def createOutputX(n: Int): Seq[BitcoinTransactionOutput] = {
     (1 to n).map { i =>
       val output      = mock[BitcoinTransactionOutput]
-      when(output.getTxOutScript).thenReturn(script)
+      when(output.getTxOutScript).thenReturn(script(i))
       when(output.getTxOutScriptLength).thenReturn(someBytes)
       output
     }

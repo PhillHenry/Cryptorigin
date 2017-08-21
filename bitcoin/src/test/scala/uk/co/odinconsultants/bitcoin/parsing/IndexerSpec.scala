@@ -13,8 +13,21 @@ class IndexerSpec extends WordSpec with Matchers with MockitoSugar with TestDoma
 
   import Indexer._
 
-  "A transaction" should {
-    "be a mapping of inputs to outputs" in {
+  "A payment" should {
+
+    "map all inputs to outputs" in {
+      val inputs      = createInputX(10)
+      val outputs     = createOutputX(9)
+      val tx          = createTransaction(inputs, outputs)
+      val store       = mock[HBaseMetaRetrieval]
+      val storedKeys  = inputs.zipWithIndex.map { case (x, i) => Array.fill[Byte](20)(i.toByte) }
+      when(store(inputs.map(x => (x.getPrevTransactionHash, x.getPreviousTxOutIndex)).toList)).thenReturn(storedKeys.toList)
+
+      val graph       = cartesianProductOfIO(tx, store)
+      graph should have size (inputs.size * outputs.size)
+    }
+
+    "map an input to an output" in {
       val inputs      = createInputX(1)
       val outputs     = createOutputX(1)
       val tx          = createTransaction(inputs, outputs)
@@ -24,7 +37,7 @@ class IndexerSpec extends WordSpec with Matchers with MockitoSugar with TestDoma
 
       val graph       = cartesianProductOfIO(tx, store)
       graph should have size 1
-      graph should contain (hashed(storedKey), hashed(toPublicKey(script).get))
+      graph should contain (hashed(storedKey), hashed(toPublicKey(script(1)).get))
     }
   }
 
