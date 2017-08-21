@@ -72,7 +72,7 @@ object Indexer {
 
     val pkOutputs = toBackReferenceAddressTuples(tx)
 
-    val inIds     = pkInputs.map(hashed)
+    val inIds     = pkInputs.filter(_ == null).map(hashed)
     val outIds    = pkOutputs.map(o => hashed(o._2))
     inIds.flatMap { in =>
       outIds.map(out => (in, out))
