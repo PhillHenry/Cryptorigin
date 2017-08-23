@@ -1,6 +1,8 @@
 package uk.co.odinconsultants.bitcoin.hbase
 
 import org.apache.hadoop.hbase.client.{Admin, Connection, ConnectionFactory}
+import org.apache.hadoop.hbase.io.compress.Compression
+import org.apache.hadoop.hbase.regionserver.BloomType
 import org.apache.hadoop.hbase.{HColumnDescriptor, HTableDescriptor, TableName}
 import uk.co.odinconsultants.bitcoin.core.Logging
 
@@ -43,16 +45,22 @@ object HBaseSetup extends Logging {
 
   def toTableName(name: String): TableName = TableName.valueOf(name)
 
-  def createAddressesTable(admin: Admin): Unit =
-    createTable(admin, tableName, familyName)
+  def createAddressesTable(admin: Admin): Unit = {
+    val (table, col) = createTable(admin, tableName, familyName)
+    col.setCacheDataInL1(true)
+    col.setBloomFilterType(BloomType.ROW)
+    col.setCompressionType(Compression.Algorithm.GZ)
+    col.setCompactionCompressionType(Compression.Algorithm.GZ)
+  }
 
-  def createTable(admin: Admin, tableName: TableName, familyName: String): Unit = {
+  def createTable(admin: Admin, tableName: TableName, familyName: String): (HTableDescriptor, HColumnDescriptor) = {
     val tableDescriptor = new HTableDescriptor(tableName)
     val colDescriptor   = new HColumnDescriptor(familyName)
     tableDescriptor.addFamily(colDescriptor)
     if (!admin.tableExists(tableName)) {
-      admin.createTable(tableDescriptor)
+      admin.createTable(tableDescriptor, Array(0.toByte), Array(255.toByte), 20)
     }
+    (tableDescriptor, colDescriptor)
   }
 
 }

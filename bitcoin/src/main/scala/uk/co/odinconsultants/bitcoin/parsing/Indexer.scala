@@ -48,7 +48,7 @@ object Indexer {
   def toGraph(rdd: RDD[BitcoinTransaction], connectionFactory: () => Connection): RDD[(Long, Long)] = {
     rdd.mapPartitions { txs =>
 
-      txs.grouped(batchSize).flatMap { batch =>
+      txs.grouped(10000).flatMap { batch =>
         val connection  = connectionFactory()
         val table       = connection.getTable(tableName)
         val metaStore   = new HBaseMetaRetrieval(table, familyName)

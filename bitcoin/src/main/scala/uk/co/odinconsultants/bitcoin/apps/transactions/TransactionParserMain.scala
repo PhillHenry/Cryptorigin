@@ -21,7 +21,7 @@ object TransactionParserMain extends SparkClient with Logging {
   def process(sc: SparkContext, config: TransactionParserConfig): Unit = {
     val rdd       = blockChainRdd(sc, config.inputUrl, sc.hadoopConfiguration)
     val txs       = transactionsOf(rdd)
-    val adjacency = toGraph(txs, () => connection())
+    val adjacency = toGraph(txs, () => connection()).distinct()
     adjacency.saveAsObjectFile(config.outputUrl)
   }
 
