@@ -51,6 +51,7 @@ object HBaseSetup extends Logging {
     col.setBloomFilterType(BloomType.ROW)
     col.setCompressionType(Compression.Algorithm.GZ)
     col.setCompactionCompressionType(Compression.Algorithm.GZ)
+    col.setBlocksize(16 * 1024) // better for random access as less is pulled into (and consequently evicted) from the cache
   }
 
   def createTable(admin: Admin, tableName: TableName, familyName: String): (HTableDescriptor, HColumnDescriptor) = {

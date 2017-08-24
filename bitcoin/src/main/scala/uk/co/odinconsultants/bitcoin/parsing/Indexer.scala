@@ -1,13 +1,17 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
 import org.apache.commons.codec.binary.Hex
+import org.apache.hadoop.hbase.HConstants
 import org.apache.hadoop.hbase.client.Connection
 import org.apache.hadoop.io.BytesWritable
+import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.execution.datasources.hbase.HBaseTableCatalog
 import org.bitcoinj.params.MainNetParams
 import org.zuinnote.hadoop.bitcoin.format.common.{BitcoinBlock, BitcoinTransaction}
 import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup.{familyName, tableName}
-import uk.co.odinconsultants.bitcoin.hbase.{HBaseMetaRetrieval, HBaseMetaStore}
+import uk.co.odinconsultants.bitcoin.hbase.{HBaseMetaRetrieval, HBaseMetaStore, HBaseSetup}
 import uk.co.odinconsultants.bitcoin.parsing.DomainOps._
 import uk.co.odinconsultants.bitcoin.parsing.MetaStore.Payload
 import util.hash.MurmurHash3
@@ -60,6 +64,26 @@ object Indexer {
       }
 
     }
+  }
+
+  def catalogueAddresses(sc: SparkSession): Long = {
+    val sqlContext = sc.sqlContext
+    import sqlContext.implicits._
+    val cat = s"""{
+                  |"table":{"namespace":"default", "name":"${HBaseSetup.metaTable}", "tableCoder":"PrimitiveType"},
+                  |"rowkey":"key",
+                  |"columns":{
+                  |"col0":{"cf":"rowkey", "col":"key", "type":"string"},
+                  |"col1":{"cf":"${HBaseSetup.familyName}", "col":"col1", "type":"string"}
+                  |}
+                  |}""".stripMargin
+    val df = sqlContext
+      .read
+      .options(Map(HBaseTableCatalog.tableCatalog->cat))
+      .format("org.apache.spark.sql.execution.datasources.hbase")
+      .load()
+
+    df.count() // you don't really want this value. It's a proof of concept.  TODO
   }
 
   def cartesianProductOfIO(tx: BitcoinTransaction, metaStore: HBaseMetaRetrieval): Seq[(Long, Long)] = {

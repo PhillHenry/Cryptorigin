@@ -1,15 +1,21 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
+import org.apache.hadoop.hbase.HConstants
+import org.apache.spark.SparkConfigUtil
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.execution.datasources.hbase.{HBaseRelation, SparkHBaseConf}
 import org.scalatest.{Matchers, WordSpec}
 import org.zuinnote.hadoop.bitcoin.format.common.{BitcoinTransaction, BitcoinTransactionInput}
 import uk.co.odinconsultants.bitcoin.apps.SparkBlockChain.blockChainRdd
 import uk.co.odinconsultants.bitcoin.core.Logging
-import uk.co.odinconsultants.bitcoin.hbase.HBaseMetaRetrieval
+import uk.co.odinconsultants.bitcoin.hbase.{HBaseMetaRetrieval, HBaseSetup}
 import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup.{createAddressesTable, familyName, metaTable}
 import uk.co.odinconsultants.bitcoin.integration.hadoop.MiniHadoopClusterRunning
+import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseForTesting
 import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseForTesting.{admin, utility}
 import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseTestConfig.getConnection
-import uk.co.odinconsultants.bitcoin.integration.spark.SparkForTesting.sc
+import uk.co.odinconsultants.bitcoin.integration.spark.SparkForTesting
+import uk.co.odinconsultants.bitcoin.integration.spark.SparkForTesting._
 import uk.co.odinconsultants.bitcoin.parsing.DomainOps.toOutputAddress
 import uk.co.odinconsultants.bitcoin.parsing.Indexer.{index, toGraph, transactionsOf, write}
 
@@ -65,6 +71,13 @@ trait HdfsFixture extends MiniHadoopClusterRunning with Matchers with Logging { 
       val rddTxsInDb  = realTxs.map(HdfsFixture.inputsPointToSelf)
       val adjacency   = toGraph(rddTxsInDb, txFactory).collect
       adjacency.length shouldBe > (realTxs.count().toInt)
+    }
+
+    "produce an address mapping" in {
+      val sparkSession = SparkSession.builder().master(master).appName(appName).getOrCreate()
+      SparkConfigUtil.conf(sparkSession, SparkHBaseConf.testConf, true.toString)
+      SparkHBaseConf.conf = HBaseForTesting.utility.getConfiguration
+      Indexer.catalogueAddresses(sparkSession) should be > 0L
     }
   }
 }
