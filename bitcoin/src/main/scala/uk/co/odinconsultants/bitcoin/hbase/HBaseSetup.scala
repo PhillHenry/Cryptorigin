@@ -47,21 +47,21 @@ object HBaseSetup extends Logging {
 
   def createAddressesTable(admin: Admin): Unit = {
     val (table, col) = createTable(admin, tableName, familyName)
+  }
+
+  def createTable(admin: Admin, tableName: TableName, familyName: String): (HTableDescriptor, HColumnDescriptor) = {
+    val tableDescriptor = new HTableDescriptor(tableName)
+    val col   = new HColumnDescriptor(familyName)
     col.setCacheDataInL1(true)
     col.setBloomFilterType(BloomType.ROW)
     col.setCompressionType(Compression.Algorithm.GZ)
     col.setCompactionCompressionType(Compression.Algorithm.GZ)
     col.setBlocksize(16 * 1024) // better for random access as less is pulled into (and consequently evicted) from the cache
-  }
-
-  def createTable(admin: Admin, tableName: TableName, familyName: String): (HTableDescriptor, HColumnDescriptor) = {
-    val tableDescriptor = new HTableDescriptor(tableName)
-    val colDescriptor   = new HColumnDescriptor(familyName)
-    tableDescriptor.addFamily(colDescriptor)
+    tableDescriptor.addFamily(col)
     if (!admin.tableExists(tableName)) {
       admin.createTable(tableDescriptor, Array(0.toByte), Array(255.toByte), 20)
     }
-    (tableDescriptor, colDescriptor)
+    (tableDescriptor, col)
   }
 
 }
