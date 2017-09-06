@@ -1,5 +1,6 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
+import org.apache.commons.codec.binary.Hex
 import org.apache.hadoop.hbase.HConstants
 import org.apache.spark.SparkConfigUtil
 import org.apache.spark.sql.SparkSession
@@ -74,10 +75,31 @@ trait HdfsFixture extends MiniHadoopClusterRunning with Matchers with Logging { 
     }
 
     "produce an address mapping" in {
-      val sparkSession = SparkSession.builder().master(master).appName(appName).getOrCreate()
+      val sparkSession    = SparkSession.builder().master(master).appName(appName).getOrCreate()
+      import sparkSession.sqlContext.implicits._
+      import org.apache.spark.sql.functions.lit
       SparkConfigUtil.conf(sparkSession, SparkHBaseConf.testConf, true.toString)
       SparkHBaseConf.conf = HBaseForTesting.utility.getConfiguration
-      Indexer.catalogueAddresses(sparkSession) should be > 0L
+
+      val df              = Indexer.catalogueAddresses(sparkSession)
+//      val rows            = df.select($"col1").collect()
+      val rows            = df.collect()
+      rows.length should be > 0
+
+      val outputPKs = rows.map(_.get(1)).map(_.asInstanceOf[Array[Byte]])
+      val inputPKs  = outputs.map(_._2).collect()
+
+      // make sure we're dealing with hashes
+      outputPKs.foreach { pk => pk.length shouldBe 20}
+      inputPKs.foreach { pk => pk.length shouldBe 20}
+
+      withClue(s"\nSample of PKs persisted = ${inputPKs.take(10).map(Hex.encodeHexString).mkString(", ")}\nSample of PKs extracted = ${outputPKs.take(10).map(x => Hex.encodeHexString(x)).mkString(", ")}\n") {
+        outputPKs.distinct.length shouldBe inputPKs.distinct.length
+      }
+
+//      val nRows           = df.count()
+//      println(s"nRows = $nRows. Number of nulls = ${df.where($"col1" <=> lit(null)).count()}")
+//      nRows should be > 0L
     }
   }
 }

@@ -6,11 +6,19 @@ import org.apache.hadoop.hbase.regionserver.BloomType
 import org.apache.hadoop.hbase.{HColumnDescriptor, HTableDescriptor, TableName}
 import uk.co.odinconsultants.bitcoin.core.Logging
 
+/**
+  * "An HBase table contains column families, which are the logical and physical grouping of columns. There are column
+  * qualifiers inside of a column family, which are the columns. Column families contain columns with time stamped
+  * versions. Columns only exist when they are inserted, which makes HBase a sparse database. All column members of the
+  * same column family have the same column family prefix."
+  * https://www.ibm.com/support/knowledgecenter/en/SSPT3X_4.1.0/com.ibm.swg.im.infosphere.biginsights.analyze.doc/doc/hbaseConcepts.html
+  */
 object HBaseSetup extends Logging {
 
   val metaTable: String   = "Addresses"
   val tableName: TableName = toTableName(metaTable)
   val familyName: String  = "familyName"
+  val qualifier: String   = "AddressQualifier"
 
   def connection(): Connection = ConnectionFactory.createConnection()
 

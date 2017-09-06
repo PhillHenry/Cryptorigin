@@ -6,7 +6,7 @@ import org.apache.hadoop.hbase.client.Connection
 import org.apache.hadoop.io.BytesWritable
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.execution.datasources.hbase.HBaseTableCatalog
 import org.bitcoinj.params.MainNetParams
 import org.zuinnote.hadoop.bitcoin.format.common.{BitcoinBlock, BitcoinTransaction}
@@ -66,7 +66,7 @@ object Indexer {
     }
   }
 
-  def catalogueAddresses(sc: SparkSession): Long = {
+  def catalogueAddresses(sc: SparkSession): DataFrame = {
     val sqlContext = sc.sqlContext
     import sqlContext.implicits._
     val cat = s"""{
@@ -74,16 +74,14 @@ object Indexer {
                   |"rowkey":"key",
                   |"columns":{
                   |"col0":{"cf":"rowkey", "col":"key", "type":"string"},
-                  |"col1":{"cf":"${HBaseSetup.familyName}", "col":"col1", "type":"string"}
+                  |"col1":{"cf":"${HBaseSetup.familyName}", "col":"${HBaseSetup.qualifier}", "type":"binary"}
                   |}
                   |}""".stripMargin
-    val df = sqlContext
+    sqlContext
       .read
       .options(Map(HBaseTableCatalog.tableCatalog->cat))
       .format("org.apache.spark.sql.execution.datasources.hbase")
       .load()
-
-    df.count() // you don't really want this value. It's a proof of concept.  TODO
   }
 
   def cartesianProductOfIO(tx: BitcoinTransaction, metaStore: HBaseMetaRetrieval): Seq[(Long, Long)] = {
