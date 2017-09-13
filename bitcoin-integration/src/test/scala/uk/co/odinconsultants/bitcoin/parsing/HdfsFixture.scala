@@ -14,7 +14,7 @@ import org.zuinnote.hadoop.bitcoin.format.common.{BitcoinTransaction, BitcoinTra
 import uk.co.odinconsultants.bitcoin.apps.SparkBlockChain.blockChainRdd
 import uk.co.odinconsultants.bitcoin.core.Logging
 import uk.co.odinconsultants.bitcoin.hbase.{HBaseMetaRetrieval, HBaseSetup}
-import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup.{createAddressesTable, familyName, metaTable}
+import uk.co.odinconsultants.bitcoin.hbase.HBaseSetup._
 import uk.co.odinconsultants.bitcoin.integration.hadoop.MiniHadoopClusterRunning
 import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseForTesting
 import uk.co.odinconsultants.bitcoin.integration.hbase.HBaseForTesting.{admin, utility}
@@ -57,6 +57,9 @@ trait HdfsFixture extends MiniHadoopClusterRunning with Matchers with Logging { 
     val txFactory = () => getConnection(utility.getConfiguration)
 
     "have its metadata persisted in HBase" in {
+      if (tableExists(metaTable, admin)) {
+        dropTable(metaTable, admin)
+      }
       createAddressesTable(admin)
       write(outputs, txFactory)
 
