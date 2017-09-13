@@ -26,7 +26,17 @@ object DomainOps extends Logging {
     (in.getPrevTransactionHash, in.getPreviousTxOutIndex)
   }
 
-  def append(hash: Array[Byte], index: Long): ByteBuffer = {
+  def appendAndSalt(hash: Array[Byte], index: Long): ByteBuffer = {
+    val byteBuffer: ByteBuffer = append(hash, index)
+
+    import java.security.MessageDigest
+    val digest    = MessageDigest.getInstance("SHA-256")
+    val digested  = digest.digest(byteBuffer.array())
+
+    ByteBuffer.wrap(digested)
+  }
+
+  private[parsing] def append(hash: Array[Byte], index: Long) = {
     val byteBuffer = ByteBuffer.allocate(hash.length + 8)
     byteBuffer.put(hash)
     byteBuffer.putLong(index)

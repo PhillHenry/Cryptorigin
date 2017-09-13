@@ -2,6 +2,7 @@ package uk.co.odinconsultants.bitcoin.parsing
 
 import java.lang.Math.pow
 
+import maths.ChiSquareUtils
 import org.apache.commons.codec.binary.Hex
 import org.apache.hadoop.hbase.HConstants
 import org.apache.hadoop.hbase.client.Scan
@@ -70,7 +71,7 @@ trait HdfsFixture extends MiniHadoopClusterRunning with Matchers with Logging { 
       }
     }
 
-    "be well distributed" ignore {
+    "be well distributed" in {
       val table   = admin.getConnection.getTable(metaTable)
       val results = table.getScanner(new Scan())
       var result  = results.next()
@@ -85,15 +86,14 @@ trait HdfsFixture extends MiniHadoopClusterRunning with Matchers with Logging { 
         result = results.next()
       }
       count shouldBe > (0)
-      val sum     = distn.values.sum
+      val sum         = distn.values.sum
       sum shouldBe count
-      val mean    = sum.toDouble / distn.size
-      val stdDev  = pow(distn.values.map(x => pow(x - mean, 2)).sum / (count - 1), 0.5)
-      val max     = distn.values.max
-      distn.toSeq.sorted.foreach { case(k, v) =>
-        withClue(s"key = $k, v = $v, mean = $mean, stdDev = $stdDev, |buckets| = ${distn.size}, count = $count\n${distn.toSeq.sortBy(_._1).map(x => f"${x._1}%-5s: ${"#" * x._2}%-50s (${x._2})").mkString("\n")}\n") {
-          (v - mean).abs shouldBe < (2 * stdDev)
-        }
+      val mean        = sum.toDouble / distn.size
+      val chiSquared  = distn.values.map(x => pow(x - mean, 2) / mean).sum
+      val pNull       = 1 - ChiSquareUtils.pochisq(chiSquared, count - 1)
+      info(s"chiSquared = $chiSquared, pNull = $pNull")
+      withClue(s"mean = $mean, |buckets| = ${distn.size}, count = $count, chiSquared = $chiSquared, pNull = $pNull\n${distn.toSeq.sortBy(_._1).map(x => f"${x._1}%-5s: ${"#" * x._2}%-50s (${x._2})").mkString("\n")}\n") {
+        pNull shouldBe < (0.01) // ie, test asserts that the chances of a fluke must be less than 1%
       }
     }
 

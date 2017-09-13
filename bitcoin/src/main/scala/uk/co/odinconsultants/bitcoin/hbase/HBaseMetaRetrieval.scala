@@ -11,7 +11,7 @@ class HBaseMetaRetrieval(table: Table, familyName: String) extends MetaRetrieval
   override def apply(batch: List[BackReference]): List[PubKey] = {
     val gets = batch map {  backReference =>
       val (hash, index) = backReference
-      val key           = DomainOps.append(hash, index)
+      val key           = DomainOps.appendAndSalt(hash, index)
       new Get(key.array())
     }
     table.get(gets).map(_.value()).toList
