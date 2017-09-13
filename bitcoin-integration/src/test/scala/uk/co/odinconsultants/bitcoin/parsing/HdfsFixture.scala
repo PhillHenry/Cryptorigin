@@ -1,7 +1,10 @@
 package uk.co.odinconsultants.bitcoin.parsing
 
+import java.lang.Math.pow
+
 import org.apache.commons.codec.binary.Hex
 import org.apache.hadoop.hbase.HConstants
+import org.apache.hadoop.hbase.client.Scan
 import org.apache.spark.SparkConfigUtil
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.execution.datasources.hbase.{HBaseRelation, SparkHBaseConf}
@@ -67,6 +70,33 @@ trait HdfsFixture extends MiniHadoopClusterRunning with Matchers with Logging { 
       }
     }
 
+    "be well distributed" ignore {
+      val table   = admin.getConnection.getTable(metaTable)
+      val results = table.getScanner(new Scan())
+      var result  = results.next()
+      var count   = 0
+      val distn   = scala.collection.mutable.Map[Byte, Int]().withDefault(_ => 0)
+      while (result != null) {
+        val row = result.getRow
+        val key = row(0)
+        val next = distn(key) + 1
+        distn += key -> next
+        count += 1
+        result = results.next()
+      }
+      count shouldBe > (0)
+      val sum     = distn.values.sum
+      sum shouldBe count
+      val mean    = sum.toDouble / distn.size
+      val stdDev  = pow(distn.values.map(x => pow(x - mean, 2)).sum / (count - 1), 0.5)
+      val max     = distn.values.max
+      distn.toSeq.sorted.foreach { case(k, v) =>
+        withClue(s"key = $k, v = $v, mean = $mean, stdDev = $stdDev, |buckets| = ${distn.size}, count = $count\n${distn.toSeq.sortBy(_._1).map(x => f"${x._1}%-5s: ${"#" * x._2}%-50s (${x._2})").mkString("\n")}\n") {
+          (v - mean).abs shouldBe < (2 * stdDev)
+        }
+      }
+    }
+
     "be parsed using the persisted metadata" in {
       val realTxs     = transactionsOf(rdd)
       val rddTxsInDb  = realTxs.map(HdfsFixture.inputsPointToSelf)
@@ -77,29 +107,23 @@ trait HdfsFixture extends MiniHadoopClusterRunning with Matchers with Logging { 
     "produce an address mapping" in {
       val sparkSession    = SparkSession.builder().master(master).appName(appName).getOrCreate()
       import sparkSession.sqlContext.implicits._
-      import org.apache.spark.sql.functions.lit
       SparkConfigUtil.conf(sparkSession, SparkHBaseConf.testConf, true.toString)
       SparkHBaseConf.conf = HBaseForTesting.utility.getConfiguration
 
       val df              = Indexer.catalogueAddresses(sparkSession)
-//      val rows            = df.select($"col1").collect()
       val rows            = df.collect()
       rows.length should be > 0
 
       val outputPKs = rows.map(_.get(1)).map(_.asInstanceOf[Array[Byte]])
       val inputPKs  = outputs.map(_._2).collect()
 
-      // make sure we're dealing with hashes
+      // make sure we're dealing with PK hashes
       outputPKs.foreach { pk => pk.length shouldBe 20}
       inputPKs.foreach { pk => pk.length shouldBe 20}
 
       withClue(s"\nSample of PKs persisted = ${inputPKs.take(10).map(Hex.encodeHexString).mkString(", ")}\nSample of PKs extracted = ${outputPKs.take(10).map(x => Hex.encodeHexString(x)).mkString(", ")}\n") {
         outputPKs.distinct.length shouldBe inputPKs.distinct.length
       }
-
-//      val nRows           = df.count()
-//      println(s"nRows = $nRows. Number of nulls = ${df.where($"col1" <=> lit(null)).count()}")
-//      nRows should be > 0L
     }
   }
 }

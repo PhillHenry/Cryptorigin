@@ -17,8 +17,8 @@ object HBaseSetup extends Logging {
 
   val metaTable: String   = "Addresses"
   val tableName: TableName = toTableName(metaTable)
-  val familyName: String  = "familyName"
-  val qualifier: String   = "AddressQualifier"
+  val familyName: String  = "fN"
+  val qualifier: String   = "AQ"
 
   def connection(): Connection = ConnectionFactory.createConnection()
 
